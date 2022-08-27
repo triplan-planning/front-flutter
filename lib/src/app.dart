@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
+import 'package:triplan/src/pages/homepage.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -61,6 +62,8 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
 
+          home: const HomePage(),
+
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
           onGenerateRoute: (RouteSettings routeSettings) {
@@ -68,14 +71,15 @@ class MyApp extends StatelessWidget {
               settings: routeSettings,
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
+                  case HomePage.routeName:
+                    return const HomePage();
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   case UserDetailView.routeName:
                     return UserDetailView(
                         user: routeSettings.arguments! as User);
-                  case UserListView.routeName:
                   default:
-                    return const UserListView();
+                    return const HomePage();
                 }
               },
             );
