@@ -1,0 +1,6 @@
+{
+  "appTitle": "triplan",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
