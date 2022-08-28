@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplan/src/forms/create_user_form.dart';
 import 'package:triplan/src/models/trip.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/pages/trip_detail_view.dart';
@@ -83,6 +84,8 @@ class MyApp extends StatelessWidget {
                   case TripDetailView.routeName:
                     return TripDetailView(
                         trip: routeSettings.arguments! as Trip);
+                  case CreateUserForm.routeName:
+                    return const CreateUserForm();
                   default:
                     return const HomePage();
                 }

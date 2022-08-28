@@ -52,11 +52,7 @@ class _TripListViewState extends State<TripListView> {
 
               return ListTile(
                   title: Text('trip: ${trip.name}'),
-                  leading: const CircleAvatar(
-                    // Display the Flutter Logo image asset.
-                    foregroundImage:
-                        AssetImage('assets/images/flutter_logo.png'),
-                  ),
+                  leading: const Icon(Icons.flight),
                   onTap: () {
                     // Navigate to the details page. If the user leaves and returns to
                     // the app after it has been killed while running in the
