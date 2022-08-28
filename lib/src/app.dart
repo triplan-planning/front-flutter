@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplan/src/models/trip.dart';
 import 'package:triplan/src/models/user.dart';
+import 'package:triplan/src/pages/trip_detail_view.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
 import 'package:triplan/src/pages/homepage.dart';
@@ -78,6 +80,9 @@ class MyApp extends StatelessWidget {
                   case UserDetailView.routeName:
                     return UserDetailView(
                         user: routeSettings.arguments! as User);
+                  case TripDetailView.routeName:
+                    return TripDetailView(
+                        trip: routeSettings.arguments! as Trip);
                   default:
                     return const HomePage();
                 }

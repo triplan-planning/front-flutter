@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:triplan/src/models/my_page.dart';
+import 'package:triplan/src/pages/trip_list_view.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
 import 'package:triplan/src/pages/welcome_view.dart';
 import 'package:triplan/src/settings/settings_view.dart';
@@ -26,6 +27,10 @@ class _HomePageState extends State<HomePage> {
         widget: const UserListView(),
         title: "users",
         icon: const Icon(Icons.person)),
+    MyPage(
+        widget: const TripListView(),
+        title: "trips",
+        icon: const Icon(Icons.flight)),
   ];
 
   void _onItemTapped(int index) {
