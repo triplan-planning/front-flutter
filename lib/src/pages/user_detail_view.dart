@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:triplan/src/models/user.dart';
-import 'package:http/http.dart' as http;
+import 'package:triplan/src/utils/api_tools.dart';
 
 /// Displays detailed information about a User.
 class UserDetailView extends StatelessWidget {
@@ -21,7 +19,7 @@ class UserDetailView extends StatelessWidget {
               onPressed: () {
                 _deleteUser(context);
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.delete_forever,
                 color: Colors.redAccent,
               ))
@@ -41,14 +39,7 @@ class UserDetailView extends StatelessWidget {
   }
 
   _deleteUser(BuildContext context) async {
-    final response = await http.delete(
-        Uri.parse('https://api-go-triplan.up.railway.app/users/${user.id}'));
-
-    if (response.statusCode != 204) {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to delete user users');
-    }
+    deleteEntity('users/${user.id}');
     Navigator.of(context).pop();
   }
 }
