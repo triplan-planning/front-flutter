@@ -52,6 +52,7 @@ Future<T> fetchAndDecode<T>(
 
 Future<T> createNew<T extends Serializable>(String path, T entity,
     T Function(Map<String, dynamic> json) deserializer) async {
+  String payload = jsonEncode(entity.toJson());
   Uri uri = Uri.parse(baseUrl + path);
 
   log("[API] POST $path");
@@ -60,11 +61,12 @@ Future<T> createNew<T extends Serializable>(String path, T entity,
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
-    body: jsonEncode(entity.toJson()),
+    body: payload,
   );
   log("[API] response status ${response.statusCode}");
 
   if (!response.is2xx) {
+    log('Failed to create new Entity: ${response.decodedBody}');
     throw Exception('Failed to create new Entity');
   }
 

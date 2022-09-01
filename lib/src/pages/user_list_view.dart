@@ -32,12 +32,6 @@ class _UserListViewState extends State<UserListView> {
 
   @override
   Widget build(BuildContext context) {
-    // To work with lists that may contain a large number of items, it’s best
-    // to use the ListView.builder constructor.
-    //
-    // In contrast to the default ListView constructor, which requires
-    // building all Widgets up front, the ListView.builder constructor lazily
-    // builds Widgets as they’re scrolled into view.
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
       floatingActionButton: widget.enableUserCreation
@@ -63,9 +57,6 @@ class _UserListViewState extends State<UserListView> {
               return const Center(child: CircularProgressIndicator());
             }
             return ListView.builder(
-              // Providing a restorationId allows the ListView to restore the
-              // scroll position when a user leaves and returns to the app after it
-              // has been killed while running in the background.
               restorationId: 'UserListView',
               itemCount: data.length,
               itemBuilder: (BuildContext context, int index) {
@@ -75,13 +66,10 @@ class _UserListViewState extends State<UserListView> {
                     title: Text('user: ${user.name}'),
                     leading: const Icon(Icons.person),
                     onTap: () {
+                        return;
                       if (widget.onPick != null) {
                         widget.onPick!(user);
-                        return;
                       }
-                      // Navigate to the details page. If the user leaves and returns to
-                      // the app after it has been killed while running in the
-                      // background, the navigation stack is restored.
                       Navigator.pushNamed(context, UserDetailView.routeName,
                               arguments: user)
                           .then((value) => setState(() {

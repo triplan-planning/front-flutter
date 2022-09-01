@@ -1,4 +1,6 @@
-class Group {
+import 'package:triplan/src/utils/serialisable.dart';
+
+class Group implements Serializable {
   const Group({required this.id, required this.name, required this.userIds});
 
   final String id;
@@ -11,5 +13,14 @@ class Group {
       name: json['name'],
       userIds: (json['users'] as List<dynamic>).cast<String>(),
     );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['users'] = userIds.map((e) => e.toString()).toList();
+
+    return data;
   }
 }
