@@ -1,4 +1,6 @@
-class User {
+import 'package:triplan/src/utils/serialisable.dart';
+
+class User implements Serializable {
   const User({required this.id, required this.name});
 
   final String id;
@@ -11,6 +13,7 @@ class User {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = name;
