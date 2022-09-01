@@ -5,6 +5,7 @@ import 'package:triplan/src/pages/group_list_view.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
 import 'package:triplan/src/pages/welcome_view.dart';
+import 'package:triplan/src/settings/settings_controller.dart';
 import 'package:triplan/src/settings/settings_view.dart';
 
 /// Displays detailed information about a User.
@@ -27,7 +28,7 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.home),
     ),
     MyPage(
-      widget: const UserListView(),
+      widget: const UserListView(enableUserCreation: true),
       title: "users",
       icon: const Icon(Icons.person),
     ),
@@ -56,20 +57,31 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              showDialog(
-                context: context,
+              Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) {
-                  return SimpleDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    alignment: Alignment.topCenter,
-                    title: Text("Current user: ???"),
-                    children: [
-                      Text('hey'),
-                    ],
+                  return UserListView(
+                    onPick: (p0) async {
+                      await SettingsController.of(context).updateUserId(p0.id);
+                      if (!mounted) return;
+                      Navigator.of(context).pop();
+                    },
                   );
                 },
-              );
+              ));
+              // showDialog(
+              //   context: context,
+              //   builder: (context) {
+              //     return SimpleDialog(
+              //       shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(8)),
+              //       alignment: Alignment.topCenter,
+              //       title: Text("Current user: ???"),
+              //       children: [
+              //         Text('hey'),
+              //       ],
+              //     );
+              //   },
+              // );
               // Navigator.restorablePushNamed(context, SettingsView.routeName);
             },
           ),

@@ -30,74 +30,77 @@ class MyApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: settingsController,
       builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
-          // Providing a restorationScopeId allows the Navigator built by the
-          // MaterialApp to restore the navigation stack when a user leaves and
-          // returns to the app after it has been killed while running in the
-          // background.
-          restorationScopeId: 'app',
+        return SettingsProvider(
+          controller: settingsController,
+          child: MaterialApp(
+            // Providing a restorationScopeId allows the Navigator built by the
+            // MaterialApp to restore the navigation stack when a user leaves and
+            // returns to the app after it has been killed while running in the
+            // background.
+            restorationScopeId: 'app',
 
-          // Provide the generated AppLocalizations to the MaterialApp. This
-          // allows descendant Widgets to display the correct translations
-          // depending on the user's locale.
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', ''), // English, no country code
-          ],
+            // Provide the generated AppLocalizations to the MaterialApp. This
+            // allows descendant Widgets to display the correct translations
+            // depending on the user's locale.
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', ''), // English, no country code
+            ],
 
-          // Use AppLocalizations to configure the correct application title
-          // depending on the user's locale.
-          //
-          // The appTitle is defined in .arb files found in the localization
-          // directory.
-          onGenerateTitle: (BuildContext context) =>
-              AppLocalizations.of(context)!.appTitle,
+            // Use AppLocalizations to configure the correct application title
+            // depending on the user's locale.
+            //
+            // The appTitle is defined in .arb files found in the localization
+            // directory.
+            onGenerateTitle: (BuildContext context) =>
+                AppLocalizations.of(context)!.appTitle,
 
-          // Define a light and dark color theme. Then, read the user's
-          // preferred ThemeMode (light, dark, or system default) from the
-          // SettingsController to display the correct theme.
-          theme: ThemeData(
-            brightness: Brightness.light,
-            useMaterial3: true,
+            // Define a light and dark color theme. Then, read the user's
+            // preferred ThemeMode (light, dark, or system default) from the
+            // SettingsController to display the correct theme.
+            theme: ThemeData(
+              brightness: Brightness.light,
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              useMaterial3: true,
+            ),
+            themeMode: settingsController.themeMode,
+
+            home: const HomePage(),
+
+            // Define a function to handle named routes in order to support
+            // Flutter web url navigation and deep linking.
+            onGenerateRoute: (RouteSettings routeSettings) {
+              return MaterialPageRoute<void>(
+                settings: routeSettings,
+                builder: (BuildContext context) {
+                  switch (routeSettings.name) {
+                    case HomePage.routeName:
+                      return const HomePage();
+                    case SettingsView.routeName:
+                      return SettingsView(controller: settingsController);
+                    case UserDetailView.routeName:
+                      return UserDetailView(
+                          user: routeSettings.arguments! as User);
+                    case GroupDetailView.routeName:
+                      return GroupDetailView(
+                          group: routeSettings.arguments! as Group);
+                    case CreateUserForm.routeName:
+                      return const CreateUserForm();
+                    default:
+                      return const HomePage();
+                  }
+                },
+              );
+            },
           ),
-          darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            useMaterial3: true,
-          ),
-          themeMode: settingsController.themeMode,
-
-          home: const HomePage(),
-
-          // Define a function to handle named routes in order to support
-          // Flutter web url navigation and deep linking.
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                switch (routeSettings.name) {
-                  case HomePage.routeName:
-                    return const HomePage();
-                  case SettingsView.routeName:
-                    return SettingsView(controller: settingsController);
-                  case UserDetailView.routeName:
-                    return UserDetailView(
-                        user: routeSettings.arguments! as User);
-                  case GroupDetailView.routeName:
-                    return GroupDetailView(
-                        group: routeSettings.arguments! as Group);
-                  case CreateUserForm.routeName:
-                    return const CreateUserForm();
-                  default:
-                    return const HomePage();
-                }
-              },
-            );
-          },
         );
       },
     );
