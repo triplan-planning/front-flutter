@@ -10,7 +10,12 @@ import 'package:triplan/src/utils/api_tools.dart';
 class UserListView extends StatefulWidget {
   const UserListView({
     Key? key,
+    this.onPick,
+    this.enableUserCreation = false,
   }) : super(key: key);
+
+  final Function(User)? onPick;
+  final bool enableUserCreation;
 
   @override
   State<UserListView> createState() => _UserListViewState();
@@ -35,15 +40,17 @@ class _UserListViewState extends State<UserListView> {
     // builds Widgets as they’re scrolled into view.
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, CreateUserForm.routeName)
-              .then((_) => setState(() {
-                    futureUsers = fetchUsers();
-                  }));
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: widget.enableUserCreation
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, CreateUserForm.routeName)
+                    .then((_) => setState(() {
+                          futureUsers = fetchUsers();
+                        }));
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: FutureBuilder<List<User>>(
           future: futureUsers,
           builder: (context, snapshot) {
@@ -68,6 +75,10 @@ class _UserListViewState extends State<UserListView> {
                     title: Text('user: ${user.name}'),
                     leading: const Icon(Icons.person),
                     onTap: () {
+                      if (widget.onPick != null) {
+                        widget.onPick!(user);
+                        return;
+                      }
                       // Navigate to the details page. If the user leaves and returns to
                       // the app after it has been killed while running in the
                       // background, the navigation stack is restored.

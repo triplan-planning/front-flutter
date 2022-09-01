@@ -25,23 +25,47 @@ class SettingsView extends StatelessWidget {
         //
         // When a user selects a theme from the dropdown list, the
         // SettingsController is updated, which rebuilds the MaterialApp.
-        child: DropdownButton<ThemeMode>(
-          // Read the selected themeMode from the controller
-          value: controller.themeMode,
-          // Call the updateThemeMode method any time the user selects a theme.
-          onChanged: controller.updateThemeMode,
-          items: const [
-            DropdownMenuItem(
-              value: ThemeMode.system,
-              child: Text('System Theme'),
+        child: Flex(
+          direction: Axis.vertical,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ListTile(
+              title: const Text("Theme"),
+              trailing: DropdownButton<ThemeMode>(
+                // Read the selected themeMode from the controller
+                value: controller.themeMode,
+                // Call the updateThemeMode method any time the user selects a theme.
+                onChanged: controller.updateThemeMode,
+                items: const [
+                  DropdownMenuItem(
+                    value: ThemeMode.system,
+                    child: Text('System Theme'),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.light,
+                    child: Text('Light Theme'),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.dark,
+                    child: Text('Dark Theme'),
+                  )
+                ],
+              ),
             ),
-            DropdownMenuItem(
-              value: ThemeMode.light,
-              child: Text('Light Theme'),
+            CheckboxListTile(
+              title: const Text("Developer mode"),
+              value: controller.devMode,
+              onChanged: (value) {
+                controller.updateDevMode(value);
+              },
             ),
-            DropdownMenuItem(
-              value: ThemeMode.dark,
-              child: Text('Dark Theme'),
+            ListTile(
+              title: const Text("User id"),
+              trailing: Text(
+                controller.userId ?? "???",
+                style: const TextStyle(fontFamily: "monospace"),
+              ),
             )
           ],
         ),
