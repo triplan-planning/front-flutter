@@ -66,9 +66,22 @@ Future<T> createNew<T extends Serializable>(String path, T entity,
   log("[API] response status ${response.statusCode}");
 
   if (!response.is2xx) {
-    log('Failed to create new Entity: ${response.decodedBody}');
+    log('Failed to create new entity: ${response.decodedBody}');
     throw Exception('Failed to create new Entity');
   }
 
   return deserializer(jsonDecode(response.decodedBody));
+}
+
+void deleteEntity(String path) async {
+  Uri uri = Uri.parse(baseUrl + path);
+
+  log("[API] DELETE $path");
+  final response = await http.delete(uri);
+  log("[API] response status ${response.statusCode}");
+
+  if (!response.is2xx) {
+    log('Failed to delete entity: ${response.decodedBody}');
+    throw Exception('Failed to delete Entity');
+  }
 }
