@@ -38,36 +38,41 @@ class CreateUserFormState extends State<CreateUserForm> {
       appBar: AppBar(
         title: const Text('New User'),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          // Validate returns true if the form is valid, or false otherwise.
+          if (_formKey.currentState!.validate()) {
+            User user = User(id: "N/A", name: nameFieldController.text);
+            var createdUser = await createUser(user);
+            log("submitted form");
+          }
+          if (!mounted) return;
+          Navigator.of(context).pop();
+        },
+        backgroundColor: Colors.green,
+        icon: Icon(Icons.check),
+        label: Text("Create User"),
+      ),
       body: Form(
         key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextFormField(
-              decoration: const InputDecoration(hintText: 'name'),
-              controller: nameFieldController,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate()) {
-                    User user = User(id: "N/A", name: nameFieldController.text);
-                    var createdUser = createUser(user);
-                    log("submitted form");
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                autofocus: true,
+                decoration: const InputDecoration(hintText: 'name'),
+                controller: nameFieldController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter some text';
                   }
+                  return null;
                 },
-                child: const Text('Submit'),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

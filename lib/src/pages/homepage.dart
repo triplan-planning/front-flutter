@@ -47,22 +47,32 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     MyPage selectedPage = _pages.elementAt(_selectedIndex);
-    FloatingActionButton? newButton;
-    switch (selectedPage.title) {
-      case "users":
-        newButton = FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, CreateUserForm.routeName);
-          },
-          child: const Icon(Icons.add),
-        );
-        break;
-      default:
-    }
+
     return Scaffold(
       appBar: AppBar(
+        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
         title: Text(selectedPage.title),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    alignment: Alignment.topCenter,
+                    title: Text("Current user: ???"),
+                    children: [
+                      Text('hey'),
+                    ],
+                  );
+                },
+              );
+              // Navigator.restorablePushNamed(context, SettingsView.routeName);
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -84,8 +94,6 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: newButton,
     );
   }
 }
