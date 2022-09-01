@@ -50,8 +50,8 @@ class CreateUserFormState extends State<CreateUserForm> {
           Navigator.of(context).pop();
         },
         backgroundColor: Colors.green,
-        icon: Icon(Icons.check),
-        label: Text("Create User"),
+        icon: const Icon(Icons.check),
+        label: const Text("Create User"),
       ),
       body: Form(
         key: _formKey,

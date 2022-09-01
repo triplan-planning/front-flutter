@@ -42,10 +42,7 @@ class _TripListViewState extends State<TripListView> {
             return const Center(child: CircularProgressIndicator());
           }
           return ListView.builder(
-            // Providing a restorationId allows the ListView to restore the
-            // scroll position when a user leaves and returns to the app after it
-            // has been killed while running in the background.
-            restorationId: 'sampleItemListView',
+            restorationId: 'TripListView',
             itemCount: data.length,
             itemBuilder: (BuildContext context, int index) {
               final trip = data[index];
