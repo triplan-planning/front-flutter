@@ -2,20 +2,21 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:triplan/src/models/trip.dart';
-import 'package:triplan/src/pages/trip_detail_view.dart';
+import 'package:triplan/src/models/group.dart';
+import 'package:triplan/src/pages/group_detail_view.dart';
+import 'package:triplan/src/utils/api_tools.dart';
 
-class TripListView extends StatefulWidget {
-  const TripListView({
+class GroupListView extends StatefulWidget {
+  const GroupListView({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<TripListView> createState() => _TripListViewState();
+  State<GroupListView> createState() => _GroupListViewState();
 }
 
-class _TripListViewState extends State<TripListView> {
-  late Future<List<Trip>> futureTrips;
+class _GroupListViewState extends State<GroupListView> {
+  late Future<List<Group>> futureTrips;
 
   @override
   void initState() {
@@ -31,7 +32,7 @@ class _TripListViewState extends State<TripListView> {
     // In contrast to the default ListView constructor, which requires
     // building all Widgets up front, the ListView.builder constructor lazily
     // builds Widgets as they’re scrolled into view.
-    return FutureBuilder<List<Trip>>(
+    return FutureBuilder<List<Group>>(
         future: futureTrips,
         builder: (context, snapshot) {
           var data = snapshot.data;
@@ -45,37 +46,26 @@ class _TripListViewState extends State<TripListView> {
             restorationId: 'TripListView',
             itemCount: data.length,
             itemBuilder: (BuildContext context, int index) {
-              final trip = data[index];
+              final group = data[index];
 
               return ListTile(
-                  title: Text('trip: ${trip.name}'),
+                  title: Text('group: ${group.name}'),
                   leading: const Icon(Icons.flight),
                   onTap: () {
                     // Navigate to the details page. If the user leaves and returns to
                     // the app after it has been killed while running in the
                     // background, the navigation stack is restored.
-                    Navigator.pushNamed(context, TripDetailView.routeName,
-                        arguments: trip);
+                    Navigator.pushNamed(context, GroupDetailView.routeName,
+                        arguments: group);
                   });
             },
           );
         });
   }
 
-  Future<List<Trip>> fetchTrips() async {
-    final response = await http
-        .get(Uri.parse('https://api-go-triplan.up.railway.app/trips'));
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      return List.of(jsonDecode(utf8.decode(response.bodyBytes)))
-          .map((u) => Trip.fromJson(u))
-          .toList();
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load trips');
-    }
+  Future<List<Group>> fetchTrips() async {
+    Future<List<Group>> response = fetchAndDecodeList(
+        '/groups', (l) => l.map((e) => Group.fromJson(e)).toList());
+    return response;
   }
 }

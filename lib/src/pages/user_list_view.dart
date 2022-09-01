@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:triplan/src/forms/create_user_form.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
+import 'package:triplan/src/utils/api_tools.dart';
 
 class UserListView extends StatefulWidget {
   const UserListView({
@@ -83,19 +84,8 @@ class _UserListViewState extends State<UserListView> {
   }
 
   Future<List<User>> fetchUsers() async {
-    final response = await http
-        .get(Uri.parse('https://api-go-triplan.up.railway.app/users'));
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      return List.of(jsonDecode(utf8.decode(response.bodyBytes)))
-          .map((u) => User.fromJson(u))
-          .toList();
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load users');
-    }
+    Future<List<User>> response = fetchAndDecodeList(
+        '/users', (l) => l.map((e) => User.fromJson(e)).toList());
+    return response;
   }
 }

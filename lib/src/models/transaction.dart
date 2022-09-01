@@ -1,15 +1,12 @@
-import 'dart:developer';
-import 'dart:developer';
-
-class SpendingPaidFor {
-  const SpendingPaidFor({required this.userId, this.forcePrice, this.weight});
+class TransactionTarget {
+  const TransactionTarget({required this.userId, this.forcePrice, this.weight});
 
   final String userId;
   final num? forcePrice;
   final num? weight;
 
-  factory SpendingPaidFor.fromJson(Map<String, dynamic> json) {
-    return SpendingPaidFor(
+  factory TransactionTarget.fromJson(Map<String, dynamic> json) {
+    return TransactionTarget(
       userId: json['user'],
       forcePrice: json['forcePrice'],
       weight: json['weight'],
@@ -17,10 +14,10 @@ class SpendingPaidFor {
   }
 }
 
-class Spending {
-  const Spending(
+class Transaction {
+  const Transaction(
       {required this.id,
-      required this.tripId,
+      required this.groupId,
       required this.paidBy,
       required this.paidFor,
       required this.amount,
@@ -29,20 +26,20 @@ class Spending {
       this.title});
 
   final String id;
-  final String tripId;
+  final String groupId;
   final String paidBy;
-  final List<SpendingPaidFor> paidFor;
+  final List<TransactionTarget> paidFor;
   final num amount;
   final DateTime date;
   final String category;
   final String? title;
 
-  factory Spending.fromJson(Map<String, dynamic> json) {
-    return Spending(
+  factory Transaction.fromJson(Map<String, dynamic> json) {
+    return Transaction(
       id: json['id'],
-      tripId: json['trip'],
+      groupId: json['group'],
       paidBy: json['paidBy'],
-      paidFor: (json['paidFor'] as List<dynamic>).cast<SpendingPaidFor>(),
+      paidFor: (json['paidFor'] as List<dynamic>).cast<TransactionTarget>(),
       amount: json['amount'],
       date: DateTime.parse(json['date']),
       category: json['category'],
