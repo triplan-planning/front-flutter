@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:triplan/src/models/user.dart';
+import 'package:triplan/src/utils/api_tools.dart';
 
 // Define a custom Form widget.
 class CreateUserForm extends StatefulWidget {
@@ -43,8 +44,7 @@ class CreateUserFormState extends State<CreateUserForm> {
           // Validate returns true if the form is valid, or false otherwise.
           if (_formKey.currentState!.validate()) {
             User user = User(id: "N/A", name: nameFieldController.text);
-            var createdUser = await createUser(user);
-            log("submitted form");
+            await createUser(user);
           }
           if (!mounted) return;
           Navigator.of(context).pop();
@@ -80,21 +80,5 @@ class CreateUserFormState extends State<CreateUserForm> {
 }
 
 Future<User> createUser(User user) async {
-  final response = await http.post(
-    Uri.parse('https://api-go-triplan.up.railway.app/users'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(user.toJson()),
-  );
-
-  if (response.statusCode == 200) {
-    User createdUser =
-        User.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-    log("user created");
-    return createdUser;
-  } else {
-    log("user not created: ${response.body}");
-    throw Exception('Failed to load user');
-  }
+  return createNew("/users", user, User.fromJson);
 }
