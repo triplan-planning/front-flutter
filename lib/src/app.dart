@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:triplan/src/forms/create_group_form.dart';
 import 'package:triplan/src/forms/create_user_form.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/user.dart';

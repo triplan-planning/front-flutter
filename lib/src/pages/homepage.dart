@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:triplan/src/forms/create_user_form.dart';
 import 'package:triplan/src/models/my_page.dart';
 import 'package:triplan/src/pages/group_list_view.dart';
-import 'package:triplan/src/pages/user_detail_view.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
 import 'package:triplan/src/pages/welcome_view.dart';
 import 'package:triplan/src/settings/settings_controller.dart';

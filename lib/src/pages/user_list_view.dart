@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:triplan/src/forms/create_user_form.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
@@ -66,7 +63,6 @@ class _UserListViewState extends State<UserListView> {
                     title: Text('user: ${user.name}'),
                     leading: const Icon(Icons.person),
                     onTap: () {
-                        return;
                       if (widget.onPick != null) {
                         widget.onPick!(user);
                       }
