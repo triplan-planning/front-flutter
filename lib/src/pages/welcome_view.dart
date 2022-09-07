@@ -9,6 +9,6 @@ class WelcomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
         child:
-            Text("Welcome" + (SettingsController.of(context).userId ?? "???")));
+            Text("Welcome ${SettingsController.of(context).userId ?? "???"}"));
   }
 }

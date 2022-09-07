@@ -28,7 +28,11 @@ Future<List<T>> fetchAndDecodeList<T>(
     throw Exception('Failed to load data from api endpoint $path');
   }
 
-  var jsonResponse = jsonDecode(response.decodedBody);
+  if (response.decodedBody == "null") {
+    return List.empty();
+  }
+
+  dynamic jsonResponse = jsonDecode(response.decodedBody);
 
   return deserializer(jsonResponse);
 }
