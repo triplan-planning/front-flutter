@@ -20,4 +20,9 @@ class User implements Serializable {
 
     return data;
   }
+
+  @override
+  String toString() {
+    return 'User($name,$id)';
+  }
 }

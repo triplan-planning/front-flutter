@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:triplan/src/models/transaction.dart';
+import 'package:triplan/src/forms/create_transaction_form.dart';
 import 'package:triplan/src/models/group.dart';
+import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/utils/api_tools.dart';
+import 'package:triplan/src/widgets/transaction_list_item.dart';
 
 /// Displays detailed information about a User.
 class GroupDetailView extends StatefulWidget {
@@ -26,8 +28,16 @@ class _GroupDetailViewState extends State<GroupDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, CreateTransactionForm.routeName,
+              arguments: widget.group);
+        },
+        child: const Icon(Icons.add),
+      ),
       appBar: AppBar(
-        title: const Text('Trip Details'),
+        title: const Text('Group Details'),
       ),
       body: Flex(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -53,10 +63,7 @@ class _GroupDetailViewState extends State<GroupDetailView> {
                   itemBuilder: (BuildContext context, int index) {
                     final transaction = data[index];
 
-                    return ListTile(
-                      title: Text('transaction: ${transaction.title}'),
-                      leading: const Icon(Icons.money),
-                    );
+                    return TransactionListItem(transaction: transaction);
                   },
                 );
               }),

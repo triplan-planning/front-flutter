@@ -1,4 +1,6 @@
-class TransactionTarget {
+import 'package:triplan/src/utils/serialisable.dart';
+
+class TransactionTarget implements Serializable {
   const TransactionTarget({required this.userId, this.forcePrice, this.weight});
 
   final String userId;
@@ -12,9 +14,20 @@ class TransactionTarget {
       weight: json['weight'],
     );
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+
+    data['user'] = userId;
+    data['forcePrice'] = forcePrice;
+    data['weight'] = weight;
+
+    return data;
+  }
 }
 
-class Transaction {
+class Transaction implements Serializable {
   const Transaction(
       {required this.id,
       required this.groupId,
@@ -45,5 +58,20 @@ class Transaction {
       category: json['category'],
       title: json['title'],
     );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+
+    data['paidFor'] = paidFor.map((e) => e.toJson()).toList();
+    data['group'] = groupId;
+    data['paidBy'] = paidBy;
+    data['amount'] = amount;
+    data['date'] = date.toUtc().toIso8601String();
+    data['category'] = category;
+    data['title'] = title;
+
+    return data;
   }
 }
