@@ -53,6 +53,9 @@ class _UserListViewState extends State<UserListView> {
                 data == null) {
               return const Center(child: CircularProgressIndicator());
             }
+            if (data.isEmpty) {
+              return const Center(child: Text("no data"));
+            }
             return ListView.builder(
               restorationId: 'UserListView',
               itemCount: data.length,

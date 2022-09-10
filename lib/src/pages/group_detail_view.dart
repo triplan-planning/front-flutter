@@ -57,6 +57,9 @@ class _GroupDetailViewState extends State<GroupDetailView> {
                     data == null) {
                   return const Center(child: CircularProgressIndicator());
                 }
+                if (data.isEmpty) {
+                  return const Center(child: Text("no data"));
+                }
                 return ListView.builder(
                   restorationId: 'GroupDetailView',
                   itemCount: data.length,

@@ -45,6 +45,9 @@ class _GroupListViewState extends State<GroupListView> {
             if (data == null) {
               return const Center(child: CircularProgressIndicator());
             }
+            if (data.isEmpty) {
+              return const Center(child: Text("no data"));
+            }
             return ListView.builder(
               restorationId: 'GroupListView',
               itemCount: data.length,
