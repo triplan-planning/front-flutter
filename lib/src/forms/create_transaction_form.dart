@@ -18,12 +18,20 @@ class CreateTransactionForm extends StatefulWidget {
 }
 
 class _CreateTransactionFormState extends State<CreateTransactionForm> {
+  late Future<List<User>> groupUsers;
+
   final _formKey = GlobalKey<FormState>();
 
   final _transactionTitle = TextEditingController();
   final _transactionCategory = TextEditingController();
   final _transactionAmount = TextEditingController();
   User? _payingUser;
+
+  @override
+  void initState() {
+    super.initState();
+    groupUsers = fetchMultipleUsers(widget.group.userIds);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +73,27 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
                   FilteringTextInputFormatter.digitsOnly
                 ],
               ),
-              UserSelector(
-                  userIds: widget.group.userIds,
-                  onChanged: (User? newValue) {
-                    setState(() {
-                      _payingUser = newValue!;
-                    });
+              FutureBuilder<List<User>>(
+                  future: groupUsers,
+                  builder: (context, snapshot) {
+                    var data = snapshot.data;
+                    if (snapshot.error != null) {
+                      return ErrorWidget(snapshot.error!);
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting ||
+                        data == null) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (data.isEmpty) {
+                      return const Center(child: Text("no data"));
+                    }
+                    return UserSelector(
+                        users: data,
+                        onChanged: (User? newValue) {
+                          setState(() {
+                            _payingUser = newValue!;
+                          });
+                        });
                   }),
             ],
           ),
@@ -100,6 +123,16 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
       ),
     );
   }
+}
+
+Future<User> fetchUser(String userId) async {
+  Future<User> response =
+      fetchAndDecode('/users/$userId', (u) => User.fromJson(u));
+  return response;
+}
+
+Future<List<User>> fetchMultipleUsers(List<String> userIds) async {
+  return await Future.wait(userIds.map((id) => fetchUser(id)));
 }
 
 Future<Transaction> createTransaction(
