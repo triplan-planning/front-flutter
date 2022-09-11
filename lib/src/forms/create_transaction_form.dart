@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:triplan/src/forms/form_fields/user_selector.dart';
@@ -6,6 +8,7 @@ import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/settings/settings_controller.dart';
 import 'package:triplan/src/utils/api_tools.dart';
+import 'package:triplan/src/widgets/transaction_form_user_item.dart';
 
 class CreateTransactionForm extends StatefulWidget {
   const CreateTransactionForm({required this.group, super.key});
@@ -26,11 +29,15 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
   final _transactionCategory = TextEditingController();
   final _transactionAmount = TextEditingController();
   User? _payingUser;
+  Map<User, TransactionTarget?>? _paidFor;
 
   @override
   void initState() {
     super.initState();
-    groupUsers = fetchMultipleUsers(widget.group.userIds);
+    groupUsers = fetchMultipleUsers(widget.group.userIds).then((users) {
+      _paidFor = {for (var u in users) u: null};
+      return users;
+    });
   }
 
   @override
@@ -43,70 +50,97 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
       ),
       body: Form(
         key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextFormField(
-                autofocus: true,
-                decoration: const InputDecoration(labelText: 'title'),
-                controller: _transactionTitle,
-              ),
-              TextFormField(
-                autofocus: true,
-                decoration: const InputDecoration(labelText: 'category'),
-                controller: _transactionCategory,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'title'),
+              controller: _transactionTitle,
+            ),
+            TextFormField(
+              autofocus: true,
+              decoration: const InputDecoration(labelText: 'category'),
+              controller: _transactionCategory,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              decoration: const InputDecoration(hintText: 'amount'),
+              controller: _transactionAmount,
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ],
+            ),
+            FutureBuilder<List<User>>(
+                future: groupUsers,
+                builder: (context, snapshot) {
+                  var data = snapshot.data;
+                  if (snapshot.error != null) {
+                    return ErrorWidget(snapshot.error!);
                   }
-                  return null;
-                },
-              ),
-              TextFormField(
-                autofocus: true,
-                decoration: const InputDecoration(hintText: 'amount'),
-                controller: _transactionAmount,
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly
-                ],
-              ),
-              FutureBuilder<List<User>>(
-                  future: groupUsers,
-                  builder: (context, snapshot) {
-                    var data = snapshot.data;
-                    if (snapshot.error != null) {
-                      return ErrorWidget(snapshot.error!);
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting ||
-                        data == null) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (data.isEmpty) {
-                      return const Center(child: Text("no data"));
-                    }
-                    return UserSelector(
-                        users: data,
-                        onChanged: (User? newValue) {
-                          setState(() {
-                            _payingUser = newValue!;
-                          });
-                        });
-                  }),
-            ],
-          ),
+                  if (snapshot.connectionState == ConnectionState.waiting ||
+                      data == null) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (data.isEmpty) {
+                    return const Center(child: Text("no data"));
+                  }
+                  return Column(
+                    children: [
+                      Flex(
+                        direction: Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Text("paid by"),
+                          UserSelector(
+                              users: data,
+                              onChanged: (User? newValue) {
+                                setState(() {
+                                  _payingUser = newValue!;
+                                });
+                              }),
+                        ],
+                      ),
+                      const Divider(),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: data.length,
+                          itemBuilder: ((context, index) {
+                            final user = data[index];
+                            return TransactionFormUserItem(
+                              user: user,
+                              onChanged:
+                                  (Map<User, TransactionTarget?>? newValue) {
+                                setState(() {
+                                  _paidFor = {..._paidFor!, ...newValue!};
+                                });
+                              },
+                            );
+                          }))
+                    ],
+                  );
+                }),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
+            log("suuubmit !");
+            List<TransactionTarget> paidFor = [];
+            _paidFor?.forEach((k, v) => paidFor.add(v!));
             Transaction transaction = Transaction(
               id: "N/A",
               groupId: widget.group.id,
               paidBy: _payingUser!.id,
-              paidFor: [TransactionTarget(userId: currentUserId, weight: 2)],
+              paidFor: paidFor,
               amount: int.parse(_transactionAmount.text) * 100,
               date: DateTime.now(),
               category: _transactionCategory.text,
@@ -115,6 +149,8 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
             await createTransaction(widget.group.id, transaction);
             if (!mounted) return;
             Navigator.of(context).pop();
+          } else {
+            log("form not valid, please handle");
           }
         },
         backgroundColor: Colors.green,
