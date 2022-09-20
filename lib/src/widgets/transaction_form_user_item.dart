@@ -17,6 +17,8 @@ class TransactionFormUserItem extends StatefulWidget {
 }
 
 class _TransactionFormUserItemState extends State<TransactionFormUserItem> {
+  // no default value because they don't get passed to parent widget
+  // TODO : handle default value for custom form widget
   final _weight = TextEditingController();
 
   void updateTrigger() {
@@ -32,7 +34,8 @@ class _TransactionFormUserItemState extends State<TransactionFormUserItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text('user: ${widget.user.name}'),
+      leading: const Icon(Icons.person),
+      title: Text(widget.user.name),
       trailing: SizedBox(
           width: 50,
           child: TextFormField(

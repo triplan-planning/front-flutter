@@ -75,6 +75,12 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly
               ],
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an amount';
+                }
+                return null;
+              },
             ),
             FutureBuilder<List<User>>(
                 future: groupUsers,
@@ -133,7 +139,6 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            log("suuubmit !");
             List<TransactionTarget> paidFor = [];
             _paidFor?.forEach((k, v) => paidFor.add(v!));
             Transaction transaction = Transaction(
@@ -148,7 +153,7 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
             );
             await createTransaction(widget.group.id, transaction);
             if (!mounted) return;
-            Navigator.of(context).pop();
+            Navigator.pop(context, true);
           } else {
             log("form not valid, please handle");
           }
