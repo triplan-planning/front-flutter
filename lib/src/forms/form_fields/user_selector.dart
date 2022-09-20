@@ -19,10 +19,12 @@ class _UserSelectorState extends State<UserSelector> {
   @override
   void initState() {
     super.initState();
+    /* disabled default value because it is not triggered on parent widget
     if (_selectedUser == null && widget.users.isNotEmpty) {
       log('[USER SELECTOR] default : ${widget.users[0]}');
       _selectedUser = widget.users[0];
     }
+    */
   }
 
   @override

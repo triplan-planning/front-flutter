@@ -32,7 +32,12 @@ class _GroupDetailViewState extends State<GroupDetailView> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, CreateTransactionForm.routeName,
-              arguments: widget.group);
+                  arguments: widget.group)
+              .then((_) => setState(() {
+                    // refresh transaction list after the form is closed
+                    futureTransactions =
+                        fetchTransactionsByGroupId(widget.group.id);
+                  }));
         },
         child: const Icon(Icons.add),
       ),
