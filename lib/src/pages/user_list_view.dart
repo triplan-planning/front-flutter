@@ -69,11 +69,17 @@ class _UserListViewState extends State<UserListView> {
                       if (widget.onPick != null) {
                         widget.onPick!(user);
                       }
-                      Navigator.pushNamed(context, UserDetailView.routeName,
-                              arguments: user)
-                          .then((value) => setState(() {
-                                futureUsers = fetchUsers();
-                              }));
+                      if (widget.enableUserCreation) {
+                        Navigator.pushNamed(
+                          context,
+                          UserDetailView.routeName,
+                          arguments: user,
+                        ).then(
+                          (value) => setState(() {
+                            futureUsers = fetchUsers();
+                          }),
+                        );
+                      }
                     });
               },
             );

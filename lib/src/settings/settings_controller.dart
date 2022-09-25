@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'settings_service.dart';
@@ -74,6 +76,7 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateThemeMode(newThemeMode);
+    log("switched dev mode to $_themeMode");
   }
 
   Future<void> updateDevMode(bool? newDevMode) async {
@@ -91,6 +94,7 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateDevMode(newDevMode);
+    log("switched dev mode to $_devMode");
   }
 
   Future<void> updateUserId(String? newUserId) async {
@@ -106,5 +110,6 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateUserId(newUserId);
+    log("switched user to $_userId");
   }
 }

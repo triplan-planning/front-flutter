@@ -6,7 +6,6 @@ import 'package:triplan/src/forms/form_fields/user_selector.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/models/user.dart';
-import 'package:triplan/src/settings/settings_controller.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 import 'package:triplan/src/widgets/transaction_form_user_item.dart';
 
@@ -42,8 +41,6 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
 
   @override
   Widget build(BuildContext context) {
-    String currentUserId = SettingsController.of(context).userId ?? "";
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Transaction'),

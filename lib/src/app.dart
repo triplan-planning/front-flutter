@@ -8,6 +8,7 @@ import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/pages/group_detail_view.dart';
 import 'package:triplan/src/pages/homepage.dart';
+import 'package:triplan/src/pages/login_view.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
 
 import 'settings/settings_controller.dart';
@@ -100,6 +101,8 @@ class MyApp extends StatelessWidget {
                     case CreateTransactionForm.routeName:
                       return CreateTransactionForm(
                           group: routeSettings.arguments! as Group);
+                    case UserLoginView.routeName:
+                      return const UserLoginView();
                     default:
                       return const HomePage();
                   }

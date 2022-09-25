@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:triplan/src/models/my_page.dart';
 import 'package:triplan/src/pages/group_list_view.dart';
+import 'package:triplan/src/pages/login_view.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
 import 'package:triplan/src/pages/welcome_view.dart';
-import 'package:triplan/src/settings/settings_controller.dart';
 import 'package:triplan/src/settings/settings_view.dart';
+import 'package:triplan/src/utils/global_providers.dart';
 
 /// Displays detailed information about a User.
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   static const routeName = '/';
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int _selectedIndex = 0;
 
   static final List<MyPage> _pages = <MyPage>[
@@ -44,6 +46,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    ref.read(currentUserProvider);
+  }
+
+  @override
   Widget build(BuildContext context) {
     MyPage selectedPage = _pages.elementAt(_selectedIndex);
 
@@ -55,40 +63,12 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) {
-                  return UserListView(
-                    onPick: (p0) async {
-                      await SettingsController.of(context).updateUserId(p0.id);
-                      if (!mounted) return;
-                      Navigator.of(context).pop();
-                    },
-                  );
-                },
-              ));
-              // showDialog(
-              //   context: context,
-              //   builder: (context) {
-              //     return SimpleDialog(
-              //       shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(8)),
-              //       alignment: Alignment.topCenter,
-              //       title: Text("Current user: ???"),
-              //       children: [
-              //         Text('hey'),
-              //       ],
-              //     );
-              //   },
-              // );
-              // Navigator.restorablePushNamed(context, SettingsView.routeName);
+              Navigator.pushNamed(context, UserLoginView.routeName);
             },
           ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
               Navigator.restorablePushNamed(context, SettingsView.routeName);
             },
           ),
