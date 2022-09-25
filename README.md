@@ -20,6 +20,9 @@ include with your application.
 The `assets/images` directory contains [resolution-aware
 images](https://flutter.dev/docs/development/ui/assets-and-images#resolution-aware).
 
+### Generate app icon 
+`flutter pub run flutter_launcher_icons:main`
+
 ## Localization
 
 This project generates localized messages based on arb files found in
