@@ -39,7 +39,7 @@ class UserDetailView extends StatelessWidget {
   }
 
   _deleteUser(BuildContext context) async {
-    deleteEntity('users/${user.id}');
+    deleteEntity('/users/${user.id}');
     Navigator.of(context).pop();
   }
 }
