@@ -4,10 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:triplan/src/models/user.dart';
 
 class UserSelector extends StatefulWidget {
-  const UserSelector({required this.users, required this.onChanged, super.key});
+  const UserSelector({
+    required this.users,
+    required this.onChanged,
+    this.initialValue,
+    super.key,
+  });
 
   final List<User> users;
   final void Function(User?) onChanged;
+  final User? initialValue;
 
   @override
   State<UserSelector> createState() => _UserSelectorState();
@@ -19,12 +25,14 @@ class _UserSelectorState extends State<UserSelector> {
   @override
   void initState() {
     super.initState();
-    /* disabled default value because it is not triggered on parent widget
-    if (_selectedUser == null && widget.users.isNotEmpty) {
-      log('[USER SELECTOR] default : ${widget.users[0]}');
-      _selectedUser = widget.users[0];
+    if (widget.initialValue == null) {
+      log('[USER SELECTOR] no initial value');
+    } else if (!widget.users.contains(widget.initialValue)) {
+      log('[USER SELECTOR] invalid initial value ${widget.initialValue!.id}');
+    } else {
+      log('[USER SELECTOR] initial value : ${widget.initialValue}');
+      _selectedUser = widget.initialValue;
     }
-    */
   }
 
   @override

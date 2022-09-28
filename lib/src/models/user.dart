@@ -25,4 +25,9 @@ class User implements Serializable {
   String toString() {
     return 'User($name,$id)';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is User && other.id == id && other.name == name;
+  }
 }

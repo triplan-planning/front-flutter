@@ -2,24 +2,26 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:triplan/src/forms/form_fields/user_selector.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/utils/api_tools.dart';
+import 'package:triplan/src/utils/global_providers.dart';
 import 'package:triplan/src/widgets/transaction_form_user_item.dart';
 
-class CreateTransactionForm extends StatefulWidget {
+class CreateTransactionForm extends ConsumerStatefulWidget {
   const CreateTransactionForm({required this.group, super.key});
 
   final Group group;
   static const routeName = '/transaction/new';
 
   @override
-  State<CreateTransactionForm> createState() => _CreateTransactionFormState();
+  _CreateTransactionFormState createState() => _CreateTransactionFormState();
 }
 
-class _CreateTransactionFormState extends State<CreateTransactionForm> {
+class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
   late Future<List<User>> groupUsers;
 
   final _formKey = GlobalKey<FormState>();
@@ -33,7 +35,8 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
   @override
   void initState() {
     super.initState();
-    groupUsers = fetchMultipleUsers(widget.group.userIds).then((users) {
+    ref.read(currentUserProvider);
+    groupUsers = _fetchMultipleUsers(widget.group.userIds).then((users) {
       _paidFor = {for (var u in users) u: null};
       return users;
     });
@@ -41,6 +44,8 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
 
   @override
   Widget build(BuildContext context) {
+    AsyncValue<User> currentUser = ref.watch(currentUserProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Transaction'),
@@ -82,6 +87,7 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
             FutureBuilder<List<User>>(
                 future: groupUsers,
                 builder: (context, snapshot) {
+                  User? initialUserSelected;
                   var data = snapshot.data;
                   if (snapshot.error != null) {
                     return ErrorWidget(snapshot.error!);
@@ -95,6 +101,17 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
                   if (data.isEmpty) {
                     return const Center(child: Text("no data"));
                   }
+                  currentUser.whenData((value) {
+                    if (widget.group.userIds.contains(value.id)) {
+                      log("current user in group, defined as payer");
+                      initialUserSelected = value;
+                      setState(() {
+                        _payingUser = initialUserSelected;
+                      });
+                    } else {
+                      log("current user not in group, no default payer");
+                    }
+                  });
                   return Column(
                     children: [
                       Flex(
@@ -104,7 +121,9 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
                           const Text("paid by"),
                           UserSelector(
                               users: data,
+                              initialValue: initialUserSelected,
                               onChanged: (User? newValue) {
+                                log("DEBUG user changed to $newValue");
                                 setState(() {
                                   _payingUser = newValue!;
                                 });
@@ -148,7 +167,7 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
               category: _transactionCategory.text,
               title: _transactionTitle.text,
             );
-            await createTransaction(widget.group.id, transaction);
+            await _createTransaction(widget.group.id, transaction);
             if (!mounted) return;
             Navigator.pop(context, true);
           } else {
@@ -161,23 +180,23 @@ class _CreateTransactionFormState extends State<CreateTransactionForm> {
       ),
     );
   }
-}
 
-Future<User> fetchUser(String userId) async {
-  Future<User> response =
-      fetchAndDecode('/users/$userId', (u) => User.fromJson(u));
-  return response;
-}
+  Future<User> _fetchUser(String userId) async {
+    Future<User> response =
+        fetchAndDecode('/users/$userId', (u) => User.fromJson(u));
+    return response;
+  }
 
-Future<List<User>> fetchMultipleUsers(List<String> userIds) async {
-  return await Future.wait(userIds.map((id) => fetchUser(id)));
-}
+  Future<List<User>> _fetchMultipleUsers(List<String> userIds) async {
+    return await Future.wait(userIds.map((id) => _fetchUser(id)));
+  }
 
-Future<Transaction> createTransaction(
-    String groupId, Transaction transaction) async {
-  return createNew<Transaction>(
-    '/groups/$groupId/transactions',
-    transaction,
-    Transaction.fromJson,
-  );
+  Future<Transaction> _createTransaction(
+      String groupId, Transaction transaction) async {
+    return createNew<Transaction>(
+      '/groups/$groupId/transactions',
+      transaction,
+      Transaction.fromJson,
+    );
+  }
 }
