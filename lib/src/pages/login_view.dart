@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:triplan/src/models/user.dart';
@@ -32,6 +30,19 @@ class _UserLoginViewState extends ConsumerState<UserLoginView> {
         automaticallyImplyLeading: false,
         title: const Text('Login as'),
         backgroundColor: Colors.cyan,
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await SettingsController.of(context).updateUserId(null);
+                ref.refresh(currentUserProvider);
+
+                if (!mounted) return;
+                Navigator.pop(context, true);
+              },
+              icon: const Icon(
+                Icons.logout,
+              ))
+        ],
       ),
       body: UserListView(
         enableUserCreation: false,
