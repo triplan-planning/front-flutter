@@ -42,14 +42,12 @@ class _GroupDetailViewState extends State<GroupDetailView> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Group Details'),
+        title: Text('Group : ${widget.group.name}'),
       ),
       body: Flex(
         mainAxisAlignment: MainAxisAlignment.center,
         direction: Axis.vertical,
         children: [
-          Text('name: ${widget.group.name}'),
-          Text('id: ${widget.group.id}'),
           Expanded(
             child: FutureBuilder<List<Transaction>>(
               future: futureTransactions,
@@ -76,7 +74,8 @@ class _GroupDetailViewState extends State<GroupDetailView> {
                 );
               }),
             ),
-          )
+          ),
+          Text('id: ${widget.group.id}'),
         ],
       ),
     );
