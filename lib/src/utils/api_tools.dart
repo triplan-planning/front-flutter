@@ -42,7 +42,7 @@ Future<List<T>> fetchAndDecodeList<T>(
 
   log("[API] GET $path");
   final response = await http.get(uri);
-  log("[API] response status ${response.statusCode}");
+  log("[API] GET $path : ${response.statusCode}");
 
   if (!response.is2xx) {
     log('Failed to load data from api endpoint $path');
@@ -64,7 +64,7 @@ Future<T> fetchAndDecode<T>(
 
   log("[API] GET $path");
   final response = await http.get(uri);
-  log("[API] response status ${response.statusCode}");
+  log("[API] GET $path : ${response.statusCode}");
 
   if (!response.is2xx) {
     log('Failed to load data from api endpoint $path');
@@ -89,7 +89,7 @@ Future<T> createNew<T extends Serializable>(String path, T entity,
     },
     body: payload,
   );
-  log("[API] response status ${response.statusCode}");
+  log("[API] POST $path : ${response.statusCode}");
 
   if (!response.is2xx) {
     log('Failed to create new entity: ${response.decodedBody}');
@@ -99,15 +99,17 @@ Future<T> createNew<T extends Serializable>(String path, T entity,
   return deserializer(jsonDecode(response.decodedBody));
 }
 
-void deleteEntity(String path) async {
+Future<void> deleteEntity(String path) async {
   Uri uri = Uri.parse(baseUrl + path);
 
   log("[API] DELETE $path");
   final response = await http.delete(uri);
-  log("[API] response status ${response.statusCode}");
+  log("[API] DELETE $path : ${response.statusCode}");
 
   if (!response.is2xx) {
     log('Failed to delete entity: ${response.decodedBody}');
     throw Exception('Failed to delete Entity');
   }
+
+  return;
 }

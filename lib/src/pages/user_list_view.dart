@@ -34,10 +34,14 @@ class _UserListViewState extends State<UserListView> {
       floatingActionButton: widget.enableUserCreation
           ? FloatingActionButton(
               onPressed: () {
-                Navigator.pushNamed(context, CreateUserForm.routeName)
-                    .then((_) => setState(() {
-                          futureUsers = fetchUsers();
-                        }));
+                Navigator.pushNamed(
+                  context,
+                  CreateUserForm.routeName,
+                ).then(
+                  (_) => setState(() {
+                    futureUsers = fetchUsers();
+                  }),
+                );
               },
               child: const Icon(Icons.add),
             )
@@ -49,12 +53,12 @@ class _UserListViewState extends State<UserListView> {
             if (snapshot.error != null) {
               return ErrorWidget(snapshot.error!);
             }
-            if (snapshot.connectionState == ConnectionState.waiting ||
-                data == null) {
+            if ((data == null || data.isEmpty) &&
+                snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (data.isEmpty) {
-              return const Center(child: Text("no data"));
+            if (data == null || data.isEmpty) {
+              return ErrorWidget("no data");
             }
             return ListView.builder(
               restorationId: 'UserListView',

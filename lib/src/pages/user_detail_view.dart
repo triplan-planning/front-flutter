@@ -27,8 +27,15 @@ class UserDetailView extends StatelessWidget {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                _deleteUser(context);
+              onPressed: () async {
+                /**
+                 * store the navigator before the async call to avoid using the context after an async gap.
+                 * an other way is to use a stateful widget and to check if the widget is still mounted
+                 */
+                var navigator = Navigator.of(context);
+                await _deleteUser(context);
+                if (!navigator.mounted) return;
+                navigator.pop();
               },
               icon: const Icon(
                 Icons.delete_forever,
@@ -50,7 +57,6 @@ class UserDetailView extends StatelessWidget {
   }
 
   _deleteUser(BuildContext context) async {
-    deleteEntity('/users/${user.id}');
-    Navigator.of(context).pop();
+    return deleteEntity('/users/${user.id}');
   }
 }
