@@ -6,6 +6,21 @@ import 'package:triplan/src/utils/serialisable.dart';
 
 const String baseUrl = "https://api-go-triplan.up.railway.app";
 
+class ApiException implements Exception {
+  String message = "unknown API error";
+
+  ApiException(String? cause) {
+    if (cause != null && cause != "") {
+      message = cause;
+    }
+  }
+
+  factory ApiException.fromResponse(http.Response apiResponse) {
+    String? errMsg = apiResponse.errorMessage;
+    return ApiException(errMsg);
+  }
+}
+
 extension ResponseExtension on http.Response {
   bool get is2xx {
     return (statusCode ~/ 100) == 2;
@@ -13,6 +28,11 @@ extension ResponseExtension on http.Response {
 
   String get decodedBody {
     return utf8.decode(bodyBytes);
+  }
+
+  String? get errorMessage {
+    dynamic jsonResponse = jsonDecode(decodedBody);
+    return jsonResponse?['error'] ?? "unknown API";
   }
 }
 
@@ -25,7 +45,8 @@ Future<List<T>> fetchAndDecodeList<T>(
   log("[API] response status ${response.statusCode}");
 
   if (!response.is2xx) {
-    throw Exception('Failed to load data from api endpoint $path');
+    log('Failed to load data from api endpoint $path');
+    return Future.error(ApiException.fromResponse(response));
   }
 
   if (response.decodedBody == "null") {
@@ -46,7 +67,8 @@ Future<T> fetchAndDecode<T>(
   log("[API] response status ${response.statusCode}");
 
   if (!response.is2xx) {
-    throw Exception('Failed to load data from api endpoint $path');
+    log('Failed to load data from api endpoint $path');
+    return Future.error(ApiException.fromResponse(response));
   }
 
   var jsonResponse = jsonDecode(response.decodedBody);
@@ -71,7 +93,7 @@ Future<T> createNew<T extends Serializable>(String path, T entity,
 
   if (!response.is2xx) {
     log('Failed to create new entity: ${response.decodedBody}');
-    throw Exception('Failed to create new Entity');
+    return Future.error(ApiException.fromResponse(response));
   }
 
   return deserializer(jsonDecode(response.decodedBody));
