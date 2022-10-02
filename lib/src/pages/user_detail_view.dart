@@ -13,7 +13,18 @@ class UserDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Details'),
+        title: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Hero(
+                tag: "user_${user.id}",
+                child: const Icon(Icons.person),
+              ),
+            ),
+            const Text('User Details'),
+          ],
+        ),
         actions: [
           IconButton(
               onPressed: () {

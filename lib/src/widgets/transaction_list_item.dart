@@ -10,7 +10,10 @@ class TransactionListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(transaction.category),
-      leading: const Icon(Icons.attach_money),
+      leading: Hero(
+        tag: "transaction_${transaction.id}",
+        child: const Icon(Icons.attach_money),
+      ),
       trailing: Text('\$${transaction.amount / 100}€'),
       subtitle: Text('${transaction.title}'),
     );

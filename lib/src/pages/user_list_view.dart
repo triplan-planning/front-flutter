@@ -64,7 +64,10 @@ class _UserListViewState extends State<UserListView> {
 
                 return ListTile(
                     title: Text('user: ${user.name}'),
-                    leading: const Icon(Icons.person),
+                    leading: Hero(
+                      tag: "user_${user.id}",
+                      child: const Icon(Icons.person),
+                    ),
                     onTap: () {
                       if (widget.onPick != null) {
                         widget.onPick!(user);

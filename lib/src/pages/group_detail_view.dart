@@ -42,7 +42,18 @@ class _GroupDetailViewState extends State<GroupDetailView> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: Text('Group : ${widget.group.name}'),
+        title: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Hero(
+                tag: "group_${widget.group.id}",
+                child: const Icon(Icons.flight),
+              ),
+            ),
+            Text('Group : ${widget.group.name}'),
+          ],
+        ),
       ),
       body: Flex(
         mainAxisAlignment: MainAxisAlignment.center,

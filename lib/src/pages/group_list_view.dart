@@ -56,7 +56,10 @@ class _GroupListViewState extends State<GroupListView> {
 
                 return ListTile(
                     title: Text('group: ${group.name}'),
-                    leading: const Icon(Icons.flight),
+                    leading: Hero(
+                      tag: "group_${group.id}",
+                      child: const Icon(Icons.flight),
+                    ),
                     onTap: () {
                       Navigator.pushNamed(context, GroupDetailView.routeName,
                               arguments: group)
