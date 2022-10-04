@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/src/models/my_page.dart';
 import 'package:triplan/src/pages/group_list_view.dart';
 import 'package:triplan/src/pages/login_view.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
 import 'package:triplan/src/pages/welcome_view.dart';
 import 'package:triplan/src/settings/settings_view.dart';
-import 'package:triplan/src/utils/global_providers.dart';
 
 /// Displays detailed information about a User.
 class HomePage extends ConsumerStatefulWidget {
@@ -46,12 +46,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    ref.read(currentUserProvider);
-  }
-
-  @override
   Widget build(BuildContext context) {
     MyPage selectedPage = _pages.elementAt(_selectedIndex);
 
@@ -63,13 +57,13 @@ class _HomePageState extends ConsumerState<HomePage> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              Navigator.pushNamed(context, UserLoginView.routeName);
+              Routemaster.of(context).push(FakeLoginView.routeName);
             },
           ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
+              Routemaster.of(context).push(SettingsView.routeName);
             },
           ),
         ],

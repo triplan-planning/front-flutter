@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/src/models/user.dart';
+import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
+import 'package:triplan/src/utils/provider_wrappers.dart';
 
 /// Displays detailed information about a User.
-class UserDetailView extends StatelessWidget {
-  const UserDetailView({required this.user, super.key});
+class UserDetailView extends ConsumerStatefulWidget {
+  const UserDetailView({required this.userId, this.user, super.key});
 
-  final User user;
-  static const routeName = '/user';
+  final User? user;
+  final String userId;
+  static const routeName = '/users';
 
   @override
+  _UserDetailViewState createState() => _UserDetailViewState();
+}
+
+class _UserDetailViewState extends ConsumerState<UserDetailView> {
+  @override
   Widget build(BuildContext context) {
+    AsyncValue<User> user = ref.watch(singleUserProvider(widget.userId));
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -18,11 +30,13 @@ class UserDetailView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: Hero(
-                tag: "user_${user.id}",
+                tag: "user_${widget.userId}",
                 child: const Icon(Icons.person),
               ),
             ),
-            const Text('User Details'),
+            user.toWidgetDataOnly(
+              (value) => Text('User : ${value.name}'),
+            ),
           ],
         ),
         actions: [
@@ -32,9 +46,8 @@ class UserDetailView extends StatelessWidget {
                  * store the navigator before the async call to avoid using the context after an async gap.
                  * an other way is to use a stateful widget and to check if the widget is still mounted
                  */
-                var navigator = Navigator.of(context);
+                var navigator = Routemaster.of(context);
                 await _deleteUser(context);
-                if (!navigator.mounted) return;
                 navigator.pop();
               },
               icon: const Icon(
@@ -44,19 +57,21 @@ class UserDetailView extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Flex(
-          mainAxisAlignment: MainAxisAlignment.center,
-          direction: Axis.vertical,
-          children: [
-            Text('name: ${user.name}'),
-            Text('id: ${user.id}'),
-          ],
+        child: user.toWidget(
+          (value) => Flex(
+            mainAxisAlignment: MainAxisAlignment.center,
+            direction: Axis.vertical,
+            children: [
+              Text('name: ${value.name}'),
+              Text('id: ${value.id}'),
+            ],
+          ),
         ),
       ),
     );
   }
 
   _deleteUser(BuildContext context) async {
-    return deleteEntity('/users/${user.id}');
+    return deleteEntity('/users/${widget.userId}');
   }
 }

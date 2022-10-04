@@ -1,4 +1,4 @@
-import 'package:triplan/src/utils/serialisable.dart';
+import 'package:triplan/src/utils/serializable.dart';
 
 class User implements Serializable {
   const User({required this.id, required this.name});

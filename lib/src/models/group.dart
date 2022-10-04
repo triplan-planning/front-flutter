@@ -1,4 +1,4 @@
-import 'package:triplan/src/utils/serialisable.dart';
+import 'package:triplan/src/utils/serializable.dart';
 
 class Group implements Serializable {
   const Group({required this.id, required this.name, required this.userIds});

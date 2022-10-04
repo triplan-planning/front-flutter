@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:triplan/src/forms/create_group_form.dart';
-import 'package:triplan/src/forms/create_transaction_form.dart';
-import 'package:triplan/src/forms/create_user_form.dart';
-import 'package:triplan/src/models/group.dart';
-import 'package:triplan/src/models/user.dart';
-import 'package:triplan/src/pages/group_detail_view.dart';
-import 'package:triplan/src/pages/homepage.dart';
-import 'package:triplan/src/pages/login_view.dart';
-import 'package:triplan/src/pages/user_detail_view.dart';
+import 'package:routemaster/routemaster.dart';
+import 'package:triplan/src/routes.dart';
 
 import 'settings/settings_controller.dart';
-import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
@@ -34,7 +26,7 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         return SettingsProvider(
           controller: settingsController,
-          child: MaterialApp(
+          child: MaterialApp.router(
             // Providing a restorationScopeId allows the Navigator built by the
             // MaterialApp to restore the navigation stack when a user leaves and
             // returns to the app after it has been killed while running in the
@@ -74,41 +66,10 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             themeMode: settingsController.themeMode,
-
-            home: const HomePage(),
-
-            // Define a function to handle named routes in order to support
-            // Flutter web url navigation and deep linking.
-            onGenerateRoute: (RouteSettings routeSettings) {
-              return MaterialPageRoute<void>(
-                settings: routeSettings,
-                builder: (BuildContext context) {
-                  switch (routeSettings.name) {
-                    case HomePage.routeName:
-                      return const HomePage();
-                    case SettingsView.routeName:
-                      return SettingsView(controller: settingsController);
-                    case UserDetailView.routeName:
-                      return UserDetailView(
-                          user: routeSettings.arguments! as User);
-                    case GroupDetailView.routeName:
-                      return GroupDetailView(
-                          group: routeSettings.arguments! as Group);
-                    case CreateUserForm.routeName:
-                      return const CreateUserForm();
-                    case CreateGroupForm.routeName:
-                      return const CreateGroupForm();
-                    case CreateTransactionForm.routeName:
-                      return CreateTransactionForm(
-                          group: routeSettings.arguments! as Group);
-                    case UserLoginView.routeName:
-                      return const UserLoginView();
-                    default:
-                      return const HomePage();
-                  }
-                },
-              );
-            },
+            routerDelegate: RoutemasterDelegate(
+                routesBuilder: (context) =>
+                    buildRoutes(context, settingsController)),
+            routeInformationParser: const RoutemasterParser(),
           ),
         );
       },

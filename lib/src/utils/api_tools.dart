@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
-import 'package:triplan/src/utils/serialisable.dart';
+import 'package:triplan/src/utils/serializable.dart';
 
 const String baseUrl = "https://api-go-triplan.up.railway.app";
 

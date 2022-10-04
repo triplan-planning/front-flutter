@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/main.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/pages/login_view.dart';
-import 'package:triplan/src/utils/global_providers.dart';
+import 'package:triplan/src/providers/user_providers.dart';
 
 /// Displays detailed information about a User.
 class WelcomeView extends ConsumerWidget {
@@ -11,7 +12,7 @@ class WelcomeView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<User> currentUser = ref.watch(currentUserProvider);
+    AsyncValue<User> currentUser = ref.watch(loggedInUserProvider);
     bool loggedIn = null != triplanPreferences!.getString("user_id");
 
     if (loggedIn) {
@@ -26,7 +27,7 @@ class WelcomeView extends ConsumerWidget {
       return Center(
         child: ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, UserLoginView.routeName);
+              Routemaster.of(context).push(FakeLoginView.routeName);
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

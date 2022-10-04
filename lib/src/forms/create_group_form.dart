@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 
 class CreateGroupForm extends StatefulWidget {
-  static const routeName = '/group/new';
+  static const routeName = '/groups/new';
 
   const CreateGroupForm({super.key});
 
@@ -36,7 +37,7 @@ class CreateGroupFormState extends State<CreateGroupForm> {
             await createGroup(group);
           }
           if (!mounted) return;
-          Navigator.of(context).pop();
+          Routemaster.of(context).pop();
         },
         backgroundColor: Colors.green,
         icon: const Icon(Icons.check),

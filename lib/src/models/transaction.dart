@@ -1,4 +1,4 @@
-import 'package:triplan/src/utils/serialisable.dart';
+import 'package:triplan/src/utils/serializable.dart';
 
 class TransactionTarget implements Serializable {
   const TransactionTarget({required this.userId, this.forcePrice, this.weight});

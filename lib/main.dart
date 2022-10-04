@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'src/app.dart';
@@ -20,6 +21,8 @@ void main() async {
   await settingsController.loadSettings();
 
   triplanPreferences = await SharedPreferences.getInstance();
+
+  Routemaster.setPathUrlStrategy();
 
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the

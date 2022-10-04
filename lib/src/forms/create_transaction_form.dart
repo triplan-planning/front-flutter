@@ -3,19 +3,22 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/src/forms/form_fields/user_selector.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/models/user.dart';
+import 'package:triplan/src/providers/group_providers.dart';
+import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
-import 'package:triplan/src/utils/global_providers.dart';
+import 'package:triplan/src/utils/provider_wrappers.dart';
 import 'package:triplan/src/widgets/error_text.dart';
 import 'package:triplan/src/widgets/transaction_form_user_item.dart';
 
 class CreateTransactionForm extends ConsumerStatefulWidget {
-  const CreateTransactionForm({required this.group, super.key});
+  const CreateTransactionForm({required this.groupId, super.key});
+  final String groupId;
 
-  final Group group;
   static const routeName = '/transaction/new';
 
   @override
@@ -24,7 +27,6 @@ class CreateTransactionForm extends ConsumerStatefulWidget {
 
 class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
   String? error;
-  late Future<List<User>> groupUsers;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -35,18 +37,11 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
   Map<User, TransactionTarget?>? _paidFor;
 
   @override
-  void initState() {
-    super.initState();
-    ref.read(currentUserProvider);
-    groupUsers = _fetchMultipleUsers(widget.group.userIds).then((users) {
-      _paidFor = {for (var u in users) u: null};
-      return users;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    AsyncValue<User> currentUser = ref.watch(currentUserProvider);
+    AsyncValue<Group> group = ref.watch(singleGroupProvider(widget.groupId));
+    AsyncValue<User> currentUser = ref.watch(loggedInUserProvider);
+    AsyncValue<List<User>> groupUsers =
+        ref.watch(groupUsersProvider(widget.groupId));
 
     return Scaffold(
       appBar: AppBar(
@@ -93,71 +88,56 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
                     return null;
                   },
                 ),
-                FutureBuilder<List<User>>(
-                    future: groupUsers,
-                    builder: (context, snapshot) {
-                      User? initialUserSelected;
-                      var data = snapshot.data;
-                      if (snapshot.error != null) {
-                        return ErrorWidget(snapshot.error!);
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting ||
-                          data == null) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (data.isEmpty) {
-                        return const Center(child: Text("no data"));
-                      }
-                      currentUser.whenData((value) {
-                        if (widget.group.userIds.contains(value.id)) {
-                          log("current user in group, defined as payer");
-                          initialUserSelected = value;
-                          setState(() {
-                            _payingUser = initialUserSelected;
-                          });
-                        } else {
-                          log("current user not in group, no default payer");
-                        }
+                groupUsers.toWidget((users) {
+                  User? initialUserSelected;
+                  currentUser.whenData((currentUser) {
+                    if (users.contains(currentUser)) {
+                      log("current user in group, defined as payer");
+                      initialUserSelected = currentUser;
+                      setState(() {
+                        _payingUser = initialUserSelected;
                       });
-                      return Column(
+                    } else {
+                      log("current user not in group, no default payer");
+                    }
+                  });
+                  return Column(
+                    children: [
+                      Flex(
+                        direction: Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Flex(
-                            direction: Axis.horizontal,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const Text("paid by"),
-                              UserSelector(
-                                  users: data,
-                                  initialValue: initialUserSelected,
-                                  onChanged: (User? newValue) {
-                                    log("DEBUG user changed to $newValue");
-                                    setState(() {
-                                      _payingUser = newValue!;
-                                    });
-                                  }),
-                            ],
-                          ),
-                          const Divider(),
-                          ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: data.length,
-                              itemBuilder: ((context, index) {
-                                final user = data[index];
-                                return TransactionFormUserItem(
-                                  user: user,
-                                  onChanged: (Map<User, TransactionTarget?>?
-                                      newValue) {
-                                    setState(() {
-                                      _paidFor = {..._paidFor!, ...newValue!};
-                                    });
-                                  },
-                                );
-                              }))
+                          const Text("paid by"),
+                          UserSelector(
+                              users: users,
+                              initialValue: initialUserSelected,
+                              onChanged: (User? newValue) {
+                                log("DEBUG user changed to $newValue");
+                                setState(() {
+                                  _payingUser = newValue!;
+                                });
+                              }),
                         ],
-                      );
-                    }),
+                      ),
+                      const Divider(),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: users.length,
+                          itemBuilder: ((context, index) {
+                            final user = users[index];
+                            return TransactionFormUserItem(
+                              user: user,
+                              onChanged:
+                                  (Map<User, TransactionTarget?>? newValue) {
+                                setState(() {
+                                  _paidFor = {..._paidFor!, ...newValue!};
+                                });
+                              },
+                            );
+                          }))
+                    ],
+                  );
+                }),
               ],
             ),
           ),
@@ -170,7 +150,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
             _paidFor?.forEach((k, v) => paidFor.add(v!));
             Transaction transaction = Transaction(
               id: "N/A",
-              groupId: widget.group.id,
+              groupId: widget.groupId,
               paidBy: _payingUser!.id,
               paidFor: paidFor,
               amount: int.parse(_transactionAmount.text) * 100,
@@ -179,7 +159,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
               title: _transactionTitle.text,
             );
             try {
-              await _createTransaction(widget.group.id, transaction);
+              await _createTransaction(widget.groupId, transaction);
             } on ApiException catch (e) {
               setState(() {
                 error = e.message;
@@ -187,7 +167,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
               return;
             }
             if (!mounted) return;
-            Navigator.pop(context, true);
+            Routemaster.of(context).pop();
           } else {
             log("form not valid, please handle");
           }

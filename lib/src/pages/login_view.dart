@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/pages/user_list_view.dart';
+import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/settings/settings_controller.dart';
-import 'package:triplan/src/utils/global_providers.dart';
 
-class UserLoginView extends ConsumerStatefulWidget {
-  const UserLoginView({super.key});
+class FakeLoginView extends ConsumerStatefulWidget {
+  const FakeLoginView({super.key});
 
   static const routeName = '/login';
 
@@ -14,13 +15,13 @@ class UserLoginView extends ConsumerStatefulWidget {
   _UserLoginViewState createState() => _UserLoginViewState();
 }
 
-class _UserLoginViewState extends ConsumerState<UserLoginView> {
+class _UserLoginViewState extends ConsumerState<FakeLoginView> {
   late Future<List<User>> futureUsers;
 
   @override
   void initState() {
     super.initState();
-    ref.read(currentUserProvider);
+    ref.read(loggedInUserProvider);
   }
 
   @override
@@ -34,10 +35,10 @@ class _UserLoginViewState extends ConsumerState<UserLoginView> {
           IconButton(
               onPressed: () async {
                 await SettingsController.of(context).updateUserId(null);
-                ref.refresh(currentUserProvider);
+                ref.refresh(loggedInUserProvider);
 
                 if (!mounted) return;
-                Navigator.pop(context, true);
+                Routemaster.of(context).pop();
               },
               icon: const Icon(
                 Icons.logout,
@@ -48,10 +49,10 @@ class _UserLoginViewState extends ConsumerState<UserLoginView> {
         enableUserCreation: false,
         onPick: (p0) async {
           await SettingsController.of(context).updateUserId(p0.id);
-          ref.refresh(currentUserProvider);
+          ref.refresh(loggedInUserProvider);
 
           if (!mounted) return;
-          Navigator.pop(context, true);
+          Routemaster.of(context).pop();
         },
       ),
     );

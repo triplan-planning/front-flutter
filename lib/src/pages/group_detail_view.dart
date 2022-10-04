@@ -1,45 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:triplan/src/forms/create_transaction_form.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
-import 'package:triplan/src/utils/api_tools.dart';
+import 'package:triplan/src/providers/group_providers.dart';
+import 'package:triplan/src/providers/transaction_providers.dart';
+import 'package:triplan/src/utils/provider_wrappers.dart';
 import 'package:triplan/src/widgets/transaction_list_item.dart';
 
 /// Displays detailed information about a User.
-class GroupDetailView extends StatefulWidget {
-  const GroupDetailView({required this.group, super.key});
+class GroupDetailView extends ConsumerStatefulWidget {
+  const GroupDetailView({required this.groupId, super.key});
 
-  final Group group;
-  static const routeName = '/group';
+  final String groupId;
+  static const routeName = '/groups';
 
   @override
-  State<GroupDetailView> createState() => _GroupDetailViewState();
+  _GroupDetailViewState createState() => _GroupDetailViewState();
 }
 
-class _GroupDetailViewState extends State<GroupDetailView> {
-  late Future<List<Transaction>> futureTransactions;
-
-  @override
-  void initState() {
-    super.initState();
-    futureTransactions = fetchTransactionsByGroupId(widget.group.id);
-  }
-
+class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
   @override
   Widget build(BuildContext context) {
+    AsyncValue<Group> group = ref.watch(singleGroupProvider(widget.groupId));
+    AsyncValue<List<Transaction>> transactions =
+        ref.watch(transactionsForGroupProvider(widget.groupId));
+
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, CreateTransactionForm.routeName,
-                  arguments: widget.group)
-              .then((_) => setState(() {
-                    // refresh transaction list after the form is closed
-                    futureTransactions =
-                        fetchTransactionsByGroupId(widget.group.id);
-                  }));
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: group.toWidgetDataOnly(
+        (value) => FloatingActionButton(
+          onPressed: () {
+            Routemaster.of(context)
+                .push("/groups/-/${widget.groupId}/transactions/new")
+                .result
+                .whenComplete(() =>
+                    ref.refresh(transactionsForGroupProvider(widget.groupId)));
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
       appBar: AppBar(
         title: Row(
@@ -47,11 +46,13 @@ class _GroupDetailViewState extends State<GroupDetailView> {
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: Hero(
-                tag: "group_${widget.group.id}",
+                tag: "group_${widget.groupId}",
                 child: const Icon(Icons.flight),
               ),
             ),
-            Text('Group : ${widget.group.name}'),
+            group.toWidgetDataOnly(
+              (value) => Text('Group : ${value.name}'),
+            ),
           ],
         ),
       ),
@@ -59,43 +60,21 @@ class _GroupDetailViewState extends State<GroupDetailView> {
         mainAxisAlignment: MainAxisAlignment.center,
         direction: Axis.vertical,
         children: [
-          Expanded(
-            child: FutureBuilder<List<Transaction>>(
-              future: futureTransactions,
-              builder: ((context, snapshot) {
-                var data = snapshot.data;
-                if (snapshot.error != null) {
-                  return ErrorWidget(snapshot.error!);
-                }
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    data == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (data.isEmpty) {
-                  return const Center(child: Text("no data"));
-                }
-                return ListView.builder(
-                  restorationId: 'GroupDetailView',
-                  itemCount: data.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final transaction = data[index];
-
-                    return TransactionListItem(transaction: transaction);
-                  },
-                );
-              }),
-            ),
-          ),
-          Text('id: ${widget.group.id}'),
+          Expanded(child: transactions.toWidget(
+            (data) {
+              return ListView.builder(
+                restorationId: 'GroupDetailView',
+                itemCount: data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final transaction = data[index];
+                  return TransactionListItem(transaction: transaction);
+                },
+              );
+            },
+          )),
+          group.toWidgetDataOnly((value) => Text('id: ${value.id}')),
         ],
       ),
     );
-  }
-
-  Future<List<Transaction>> fetchTransactionsByGroupId(String groupId) async {
-    Future<List<Transaction>> response = fetchAndDecodeList(
-        '/groups/$groupId/transactions',
-        (l) => l.map((e) => Transaction.fromJson(e)).toList());
-    return response;
   }
 }

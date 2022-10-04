@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 
@@ -6,7 +7,7 @@ import 'package:triplan/src/utils/api_tools.dart';
 class CreateUserForm extends StatefulWidget {
   const CreateUserForm({super.key});
 
-  static const routeName = '/user/new';
+  static const routeName = '/users/new';
 
   @override
   CreateUserFormState createState() {
@@ -42,7 +43,7 @@ class CreateUserFormState extends State<CreateUserForm> {
             await createUser(user);
           }
           if (!mounted) return;
-          Navigator.of(context).pop();
+          Routemaster.of(context).pop();
         },
         backgroundColor: Colors.green,
         icon: const Icon(Icons.check),
