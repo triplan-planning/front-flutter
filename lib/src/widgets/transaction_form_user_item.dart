@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:triplan/src/models/transaction.dart';
 
@@ -9,7 +12,8 @@ class TransactionFormUserItem extends StatefulWidget {
       {required this.user, required this.onChanged, super.key});
 
   final User user;
-  final void Function(Map<User, TransactionTarget?>?) onChanged;
+  final void Function(TransactionTarget) onChanged;
+  final initialValue = "1";
 
   @override
   State<TransactionFormUserItem> createState() =>
@@ -21,14 +25,22 @@ class _TransactionFormUserItemState extends State<TransactionFormUserItem> {
   // TODO : handle default value for custom form widget
   final _weight = TextEditingController();
 
-  void updateTrigger() {
+  void updateTrigger(String value) {
     TransactionTarget target = TransactionTarget(
       userId: widget.user.id,
-      weight: int.parse(_weight.text),
+      weight: int.tryParse(value) ?? 0,
     );
-    var map = <User, TransactionTarget>{};
-    map[widget.user] = target;
-    widget.onChanged(map);
+    widget.onChanged(target);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    log("initState");
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      updateTrigger(widget.initialValue);
+      _weight.value = TextEditingValue(text: widget.initialValue);
+    });
   }
 
   @override
@@ -39,7 +51,7 @@ class _TransactionFormUserItemState extends State<TransactionFormUserItem> {
       trailing: SizedBox(
           width: 50,
           child: TextFormField(
-            onChanged: (value) => {updateTrigger()},
+            onChanged: updateTrigger,
             controller: _weight,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -49,7 +61,8 @@ class _TransactionFormUserItemState extends State<TransactionFormUserItem> {
             },
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
+              FilteringTextInputFormatter.digitsOnly,
+              FilteringTextInputFormatter.singleLineFormatter
             ],
           )),
     );

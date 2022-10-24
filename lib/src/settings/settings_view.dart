@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-
-import 'settings_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:triplan/src/settings/settings_v2.dart';
 
 /// Displays the various settings that can be customized by the user.
 ///
 /// When a user changes a setting, the SettingsController is updated and
 /// Widgets that listen to the SettingsController are rebuilt.
-class SettingsView extends StatelessWidget {
-  const SettingsView({Key? key, required this.controller}) : super(key: key);
-
-  static const routeName = '/settings';
-
-  final SettingsController controller;
+class SettingsView extends ConsumerWidget {
+  const SettingsView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var controller = ref.watch(triplanPreferencesProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -36,7 +34,9 @@ class SettingsView extends StatelessWidget {
                 // Read the selected themeMode from the controller
                 value: controller.themeMode,
                 // Call the updateThemeMode method any time the user selects a theme.
-                onChanged: controller.updateThemeMode,
+                onChanged: (value) => ref
+                    .read(triplanPreferencesProvider.notifier)
+                    .setThemeMode(value),
                 items: const [
                   DropdownMenuItem(
                     value: ThemeMode.system,
@@ -56,17 +56,17 @@ class SettingsView extends StatelessWidget {
             CheckboxListTile(
               title: const Text("Developer mode"),
               value: controller.devMode,
-              onChanged: (value) {
-                controller.updateDevMode(value);
-              },
+              onChanged: (value) => ref
+                  .read(triplanPreferencesProvider.notifier)
+                  .setDevMode(value),
             ),
             ListTile(
               title: const Text("User id"),
               trailing: Text(
-                controller.userId ?? "???",
+                controller.userId ?? "NOT CONNECTED",
                 style: const TextStyle(fontFamily: "monospace"),
               ),
-            )
+            ),
           ],
         ),
       ),

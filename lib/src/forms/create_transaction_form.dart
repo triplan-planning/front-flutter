@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:routemaster/routemaster.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/forms/form_fields/user_selector.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
@@ -19,8 +19,6 @@ class CreateTransactionForm extends ConsumerStatefulWidget {
   const CreateTransactionForm({required this.groupId, super.key});
   final String groupId;
 
-  static const routeName = '/transaction/new';
-
   @override
   _CreateTransactionFormState createState() => _CreateTransactionFormState();
 }
@@ -34,7 +32,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
   final _transactionCategory = TextEditingController();
   final _transactionAmount = TextEditingController();
   User? _payingUser;
-  Map<User, TransactionTarget?>? _paidFor;
+  Map<User, TransactionTarget?> _paidFor = {};
 
   @override
   Widget build(BuildContext context) {
@@ -88,56 +86,63 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
                     return null;
                   },
                 ),
-                groupUsers.toWidget((users) {
-                  User? initialUserSelected;
-                  currentUser.whenData((currentUser) {
-                    if (users.contains(currentUser)) {
-                      log("current user in group, defined as payer");
-                      initialUserSelected = currentUser;
-                      setState(() {
-                        _payingUser = initialUserSelected;
-                      });
-                    } else {
-                      log("current user not in group, no default payer");
-                    }
-                  });
-                  return Column(
-                    children: [
-                      Flex(
-                        direction: Axis.horizontal,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const Text("paid by"),
-                          UserSelector(
+                groupUsers.toWidget(
+                  (users) {
+                    User? initialUserSelected;
+                    currentUser.whenData(
+                      (currentUser) {
+                        if (users.contains(currentUser)) {
+                          log("current user in group, defined as payer");
+                          initialUserSelected = currentUser;
+                          setState(() {
+                            _payingUser = initialUserSelected;
+                          });
+                        } else {
+                          log("current user not in group, no default payer");
+                        }
+                      },
+                    );
+                    return Column(
+                      children: [
+                        Flex(
+                          direction: Axis.horizontal,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            const Text("paid by"),
+                            UserSelector(
                               users: users,
                               initialValue: initialUserSelected,
                               onChanged: (User? newValue) {
                                 log("DEBUG user changed to $newValue");
-                                setState(() {
-                                  _payingUser = newValue!;
-                                });
-                              }),
-                        ],
-                      ),
-                      const Divider(),
-                      ListView.builder(
+                                setState(
+                                  () {
+                                    _payingUser = newValue!;
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const Divider(),
+                        ListView.builder(
                           shrinkWrap: true,
                           itemCount: users.length,
                           itemBuilder: ((context, index) {
                             final user = users[index];
                             return TransactionFormUserItem(
                               user: user,
-                              onChanged:
-                                  (Map<User, TransactionTarget?>? newValue) {
+                              onChanged: (TransactionTarget newValue) {
                                 setState(() {
-                                  _paidFor = {..._paidFor!, ...newValue!};
+                                  _paidFor[user] = newValue;
                                 });
                               },
                             );
-                          }))
-                    ],
-                  );
-                }),
+                          }),
+                        )
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -147,7 +152,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             List<TransactionTarget> paidFor = [];
-            _paidFor?.forEach((k, v) => paidFor.add(v!));
+            _paidFor.forEach((k, v) => paidFor.add(v!));
             Transaction transaction = Transaction(
               id: "N/A",
               groupId: widget.groupId,
@@ -167,7 +172,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
               return;
             }
             if (!mounted) return;
-            Routemaster.of(context).pop();
+            GoRouter.of(context).pop();
           } else {
             log("form not valid, please handle");
           }
@@ -192,7 +197,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
   Future<Transaction> _createTransaction(
       String groupId, Transaction transaction) async {
     return createNew<Transaction>(
-      '/groups/$groupId/transactions-error',
+      '/groups/$groupId/transactions',
       transaction,
       Transaction.fromJson,
     );

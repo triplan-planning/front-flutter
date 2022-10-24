@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:routemaster/routemaster.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/providers/group_providers.dart';
@@ -13,7 +13,6 @@ class GroupDetailView extends ConsumerStatefulWidget {
   const GroupDetailView({required this.groupId, super.key});
 
   final String groupId;
-  static const routeName = '/groups';
 
   @override
   _GroupDetailViewState createState() => _GroupDetailViewState();
@@ -31,11 +30,10 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
       floatingActionButton: group.toWidgetDataOnly(
         (value) => FloatingActionButton(
           onPressed: () {
-            Routemaster.of(context)
-                .push("/groups/-/${widget.groupId}/transactions/new")
-                .result
-                .whenComplete(() =>
-                    ref.refresh(transactionsForGroupProvider(widget.groupId)));
+            GoRouter.of(context)
+                .push("/groups/${widget.groupId}/transactions/new");
+            // TODO refresh data after poping
+            ref.refresh(transactionsForGroupProvider(widget.groupId));
           },
           child: const Icon(Icons.add),
         ),

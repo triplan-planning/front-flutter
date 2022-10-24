@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:routemaster/routemaster.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
@@ -12,7 +12,6 @@ class UserDetailView extends ConsumerStatefulWidget {
 
   final User? user;
   final String userId;
-  static const routeName = '/users';
 
   @override
   _UserDetailViewState createState() => _UserDetailViewState();
@@ -46,7 +45,7 @@ class _UserDetailViewState extends ConsumerState<UserDetailView> {
                  * store the navigator before the async call to avoid using the context after an async gap.
                  * an other way is to use a stateful widget and to check if the widget is still mounted
                  */
-                var navigator = Routemaster.of(context);
+                var navigator = GoRouter.of(context);
                 await _deleteUser(context);
                 navigator.pop();
               },

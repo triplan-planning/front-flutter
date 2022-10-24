@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:routemaster/routemaster.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 
 // Define a custom Form widget.
 class CreateUserForm extends StatefulWidget {
   const CreateUserForm({super.key});
-
-  static const routeName = '/users/new';
 
   @override
   CreateUserFormState createState() {
@@ -43,7 +41,7 @@ class CreateUserFormState extends State<CreateUserForm> {
             await createUser(user);
           }
           if (!mounted) return;
-          Routemaster.of(context).pop();
+          GoRouter.of(context).pop();
         },
         backgroundColor: Colors.green,
         icon: const Icon(Icons.check),

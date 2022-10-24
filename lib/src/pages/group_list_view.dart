@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:routemaster/routemaster.dart';
-import 'package:triplan/src/forms/create_group_form.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/group.dart';
-import 'package:triplan/src/pages/group_detail_view.dart';
 import 'package:triplan/src/providers/group_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
+import 'package:triplan/src/widgets/buttons.dart';
 
 class GroupListView extends ConsumerStatefulWidget {
-  const GroupListView({
-    Key? key,
-  }) : super(key: key);
+  const GroupListView({Key? key}) : super(key: key);
 
   @override
   _GroupListViewState createState() => _GroupListViewState();
@@ -23,13 +20,26 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
     AsyncValue<List<Group>> groups = ref.watch(allGroupsProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Groups"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              context.goNamed("settings");
+            },
+          ),
+          LogoutButton(
+            onSuccess: (ctx) => ctx.goNamed("login"),
+          ),
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Routemaster.of(context)
-              .push(CreateGroupForm.routeName)
-              .result
-              .whenComplete(() => ref.refresh(allGroupsProvider));
+        onPressed: () async {
+          GoRouter.of(context).pushNamed("groups_new");
+          // TODO refresh data after poping
+          ref.refresh(allGroupsProvider);
         },
         child: const Icon(Icons.add),
       ),
@@ -47,10 +57,9 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
                   child: const Icon(Icons.flight),
                 ),
                 onTap: () {
-                  Routemaster.of(context)
-                      .push("groups/${group.id}")
-                      .result
-                      .whenComplete(() => ref.refresh(allGroupsProvider));
+                  context.push("/groups/${group.id}");
+                  // TODO refresh data after poping
+                  ref.refresh(allGroupsProvider);
                 });
           },
         ),

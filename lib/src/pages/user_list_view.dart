@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:routemaster/routemaster.dart';
-import 'package:triplan/src/forms/create_user_form.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
@@ -30,10 +29,9 @@ class _UserListViewState extends ConsumerState<UserListView> {
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Routemaster.of(context)
-              .push(CreateUserForm.routeName)
-              .result
-              .whenComplete(() => ref.refresh(allUsersProvider));
+          context.pushNamed("users_new");
+          // TODO refresh data after poping
+          ref.refresh(allUsersProvider);
         },
         child: const Icon(Icons.add),
       ),
@@ -54,10 +52,9 @@ class _UserListViewState extends ConsumerState<UserListView> {
                       widget.onPick!(user);
                     }
                     if (widget.enableUserCreation) {
-                      Routemaster.of(context)
-                          .push("users/${user.id}")
-                          .result
-                          .whenComplete(() => ref.refresh(allUsersProvider));
+                      GoRouter.of(context).push("users/${user.id}");
+                      // TODO refresh data after poping
+                      ref.refresh(allUsersProvider);
                     }
                   });
             },
