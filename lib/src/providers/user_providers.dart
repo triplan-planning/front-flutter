@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:triplan/src/models/user.dart';
-import 'package:triplan/src/providers/group_providers.dart';
 import 'package:triplan/src/providers/preferences_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 
@@ -48,7 +47,9 @@ final multipleUserProvider = FutureProviderFamily<List<User>, List<String>>(
 
 final groupUsersProvider =
     FutureProviderFamily<List<User>, String>((ref, groupId) async {
-  final group = await ref.watch(singleGroupProvider(groupId).future);
-
-  return ref.watch(multipleUserProvider(group.userIds).future);
+  Future<List<User>> response = fetchAndDecodeList(
+    "/groups/$groupId/users",
+    (l) => l.map((e) => User.fromJson(e)).toList(),
+  );
+  return response;
 });
