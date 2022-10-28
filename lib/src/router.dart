@@ -58,9 +58,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/groups/favorite',
-        name: 'groups_favorite',
+        name: 'favorite',
         redirect: (context, state) {
-          return "/groups";
+          String? favGroupId =
+              ref.read(triplanPreferencesProvider).favoriteGroup;
+          if (null == favGroupId) {
+            return state.namedLocation("groups_list");
+          } else {
+            return state.namedLocation("groups_detail",
+                params: {"group_id": favGroupId});
+          }
         },
       ),
       GoRoute(
@@ -84,7 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: CreateTransactionForm(groupId: state.params['group_id']!)),
       ),
     ],
-    initialLocation: "/groups",
+    initialLocation: "/groups/favorite",
     errorBuilder: (context, state) => ErrorWidget(state.error!),
     redirect: (context, state) {
       final loginLoc = state.namedLocation("login");

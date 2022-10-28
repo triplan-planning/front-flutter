@@ -15,11 +15,13 @@ class PreferencesState {
   final bool devMode;
   final String? userId;
   final ThemeMode themeMode;
+  final String? favoriteGroup;
 
   const PreferencesState({
     required this.devMode,
     required this.themeMode,
     this.userId,
+    this.favoriteGroup,
   });
 
   factory PreferencesState.fromDefault() {
@@ -27,6 +29,7 @@ class PreferencesState {
       devMode: false,
       themeMode: ThemeMode.system,
       userId: null,
+      favoriteGroup: null,
     );
   }
 
@@ -39,18 +42,8 @@ class PreferencesState {
       themeMode: ThemeMode
           .values[pref.getInt("theme") ?? defaultState.themeMode.index],
       userId: pref.getString("user_id") ?? defaultState.userId,
-    );
-  }
-
-  PreferencesState copyWith({
-    bool? devMode,
-    ThemeMode? themeMode,
-    String? userId,
-  }) {
-    return PreferencesState(
-      devMode: devMode ?? this.devMode,
-      themeMode: themeMode ?? this.themeMode,
-      userId: userId ?? this.userId,
+      favoriteGroup:
+          pref.getString("favorite_group_id") ?? defaultState.favoriteGroup,
     );
   }
 }
@@ -82,28 +75,20 @@ class TriplanPreferencesNotifier extends StateNotifier<PreferencesState> {
 
   // THEME
   ThemeMode get themeMode => state.themeMode;
-  setThemeMode(ThemeMode? theme) {
+  setThemeMode(ThemeMode theme) {
     checkReadiness();
-    if (theme == null) {
-      log("[SETTINGS] null value provided for theme, not updating");
-      return;
-    }
     log("[SETTINGS] update theme to ${theme.name}");
-    state = state.copyWith(themeMode: theme);
-    pref!.setInt("theme", state.themeMode.index);
+    pref!.setInt("theme", theme.index);
+    state = PreferencesState.fromSharedPrefs(pref!);
   }
 
   // DEV MODE
   bool get devMode => state.devMode;
-  setDevMode(bool? devMode) {
+  setDevMode(bool devMode) {
     checkReadiness();
-    if (devMode == null) {
-      log("[SETTINGS] null value provided for dev mode, not updating");
-      return;
-    }
     log("[SETTINGS] update dev mode to $devMode");
-    state = state.copyWith(devMode: devMode);
-    pref!.setBool("dev_mode", state.devMode);
+    pref!.setBool("dev_mode", devMode);
+    state = PreferencesState.fromSharedPrefs(pref!);
   }
 
   // USER ID
@@ -115,8 +100,22 @@ class TriplanPreferencesNotifier extends StateNotifier<PreferencesState> {
     if (userId == null) {
       pref!.remove("user_id");
     } else {
-      state = state.copyWith(userId: userId);
-      pref!.setString("user_id", state.userId!);
+      pref!.setString("user_id", userId);
     }
+    state = PreferencesState.fromSharedPrefs(pref!);
+  }
+
+  // FAVORITE GROUP
+  String? get favoriteGroup => state.favoriteGroup;
+  setFavoriteGroup(String? favoriteGroup) {
+    checkReadiness();
+    log("[SETTINGS] update favorite group to $favoriteGroup");
+
+    if (favoriteGroup == null) {
+      pref!.remove("favorite_group_id");
+    } else {
+      pref!.setString("favorite_group_id", favoriteGroup);
+    }
+    state = PreferencesState.fromSharedPrefs(pref!);
   }
 }

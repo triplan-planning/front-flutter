@@ -6,6 +6,7 @@ import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/providers/group_providers.dart';
 import 'package:triplan/src/providers/transaction_providers.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
+import 'package:triplan/src/widgets/buttons.dart';
 import 'package:triplan/src/widgets/transaction_list_item.dart';
 
 /// Displays detailed information about a User.
@@ -39,17 +40,7 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
         ),
       ),
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            var nav = Navigator.of(context);
-            if (nav.canPop()) {
-              nav.pop();
-            } else {
-              nav.pushNamed("groups_list");
-            }
-          },
-        ),
+        leading: const PopOrBackToListButton(),
         title: Row(
           children: [
             Padding(
@@ -64,6 +55,7 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
             ),
           ],
         ),
+        actions: [FavoriteGroupButton(groupId: widget.groupId)],
       ),
       body: Flex(
         mainAxisAlignment: MainAxisAlignment.center,

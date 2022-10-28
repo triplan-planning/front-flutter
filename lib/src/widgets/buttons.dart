@@ -40,3 +40,48 @@ class SettingsButton extends StatelessWidget {
     );
   }
 }
+
+class FavoriteGroupButton extends ConsumerWidget {
+  const FavoriteGroupButton({required this.groupId, super.key});
+  final String groupId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var prefs = ref.read(triplanPreferencesProvider.notifier);
+    String? favoriteGroupId = prefs.favoriteGroup;
+
+    bool isFavorite = favoriteGroupId != null && groupId == favoriteGroupId;
+    if (isFavorite) {
+      return IconButton(
+          onPressed: () async {
+            prefs.setFavoriteGroup(null);
+          },
+          icon: const Icon(Icons.favorite));
+    } else {
+      return IconButton(
+          onPressed: () async {
+            prefs.setFavoriteGroup(groupId);
+          },
+          icon: const Icon(Icons.favorite_border));
+    }
+  }
+}
+
+class PopOrBackToListButton extends StatelessWidget {
+  const PopOrBackToListButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        var nav = Navigator.of(context);
+        if (nav.canPop()) {
+          nav.pop();
+        } else {
+          context.goNamed("groups_list");
+        }
+      },
+    );
+  }
+}

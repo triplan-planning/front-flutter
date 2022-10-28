@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:triplan/src/settings/settings_v2.dart';
+import 'package:triplan/src/widgets/buttons.dart';
 
 /// Displays the various settings that can be customized by the user.
 ///
@@ -15,6 +16,7 @@ class SettingsView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const PopOrBackToListButton(),
         title: const Text('Settings'),
       ),
       body: Padding(
@@ -34,9 +36,14 @@ class SettingsView extends ConsumerWidget {
                 // Read the selected themeMode from the controller
                 value: controller.themeMode,
                 // Call the updateThemeMode method any time the user selects a theme.
-                onChanged: (value) => ref
-                    .read(triplanPreferencesProvider.notifier)
-                    .setThemeMode(value),
+                onChanged: (value) {
+                  if (value == null) {
+                    return;
+                  }
+                  ref
+                      .read(triplanPreferencesProvider.notifier)
+                      .setThemeMode(value);
+                },
                 items: const [
                   DropdownMenuItem(
                     value: ThemeMode.system,
@@ -56,14 +63,24 @@ class SettingsView extends ConsumerWidget {
             CheckboxListTile(
               title: const Text("Developer mode"),
               value: controller.devMode,
-              onChanged: (value) => ref
-                  .read(triplanPreferencesProvider.notifier)
-                  .setDevMode(value),
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                ref.read(triplanPreferencesProvider.notifier).setDevMode(value);
+              },
             ),
             ListTile(
               title: const Text("User id"),
               trailing: Text(
                 controller.userId ?? "NOT CONNECTED",
+                style: const TextStyle(fontFamily: "monospace"),
+              ),
+            ),
+            ListTile(
+              title: const Text("favorite group"),
+              trailing: Text(
+                controller.favoriteGroup ?? "NO FAVORITE",
                 style: const TextStyle(fontFamily: "monospace"),
               ),
             ),
