@@ -16,7 +16,7 @@ final singleGroupProvider = FutureProviderFamily<Group, String>(
 final allGroupsProvider = FutureProvider<List<Group>>(
   ((ref) async {
     Future<List<Group>> response = fetchAndDecodeList(
-      '/groups/',
+      '/groups',
       (l) => l.map((e) => Group.fromJson(e)).toList(),
     );
     return response;

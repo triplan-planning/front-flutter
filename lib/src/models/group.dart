@@ -8,10 +8,15 @@ class Group implements Serializable {
   final List<String> userIds;
 
   factory Group.fromJson(Map<String, dynamic> json) {
+    List<String> users = [];
+
+    if (json.containsKey("users") && json['users'] != null) {
+      users = (json['users'] as List<dynamic>).cast<String>();
+    }
     return Group(
       id: json['id'],
       name: json['name'],
-      userIds: (json['users'] as List<dynamic>).cast<String>(),
+      userIds: users,
     );
   }
 
