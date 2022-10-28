@@ -5,6 +5,7 @@ import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/providers/group_providers.dart';
 import 'package:triplan/src/providers/transaction_providers.dart';
+import 'package:triplan/src/settings/settings_v2.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
 import 'package:triplan/src/widgets/buttons.dart';
 import 'package:triplan/src/widgets/transaction_list_item.dart';
@@ -33,7 +34,6 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
           onPressed: () {
             GoRouter.of(context)
                 .push("/groups/${widget.groupId}/transactions/new");
-            // TODO refresh data after poping
             ref.refresh(transactionsForGroupProvider(widget.groupId));
           },
           child: const Icon(Icons.add),
@@ -76,7 +76,8 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
               );
             },
           )),
-          group.toWidgetDataOnly((value) => Text('id: ${value.id}')),
+          if (ref.read(triplanPreferencesProvider).devMode)
+            group.toWidgetDataOnly((value) => Text('id: ${value.id}')),
         ],
       ),
     );

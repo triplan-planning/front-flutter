@@ -30,7 +30,6 @@ class _UserListViewState extends ConsumerState<UserListView> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.pushNamed("users_new");
-          // TODO refresh data after poping
           ref.refresh(allUsersProvider);
         },
         child: const Icon(Icons.add),
@@ -53,7 +52,6 @@ class _UserListViewState extends ConsumerState<UserListView> {
                     }
                     if (widget.enableUserCreation) {
                       GoRouter.of(context).push("users/${user.id}");
-                      // TODO refresh data after poping
                       ref.refresh(allUsersProvider);
                     }
                   });
