@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -9,11 +7,14 @@ import '../models/user.dart';
 
 class TransactionFormUserItem extends StatefulWidget {
   const TransactionFormUserItem(
-      {required this.user, required this.onChanged, super.key});
+      {required this.user,
+      required this.onChanged,
+      this.initialValue = "1",
+      super.key});
 
   final User user;
   final void Function(TransactionTarget) onChanged;
-  final initialValue = "1";
+  final String initialValue;
 
   @override
   State<TransactionFormUserItem> createState() =>
@@ -21,8 +22,6 @@ class TransactionFormUserItem extends StatefulWidget {
 }
 
 class _TransactionFormUserItemState extends State<TransactionFormUserItem> {
-  // no default value because they don't get passed to parent widget
-  // TODO : handle default value for custom form widget
   final _weight = TextEditingController();
 
   void updateTrigger(String value) {
@@ -36,8 +35,8 @@ class _TransactionFormUserItemState extends State<TransactionFormUserItem> {
   @override
   void initState() {
     super.initState();
-    log("initState");
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      // set initial value to
       updateTrigger(widget.initialValue);
       _weight.value = TextEditingValue(text: widget.initialValue);
     });
