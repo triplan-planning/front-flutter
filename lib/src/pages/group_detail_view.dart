@@ -39,6 +39,17 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
         ),
       ),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            var nav = Navigator.of(context);
+            if (nav.canPop()) {
+              nav.pop();
+            } else {
+              nav.pushNamed("groups_list");
+            }
+          },
+        ),
         title: Row(
           children: [
             Padding(
@@ -60,6 +71,9 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
         children: [
           Expanded(child: transactions.toWidget(
             (data) {
+              if (data.isEmpty) {
+                return const Center(child: Text("no transactions"));
+              }
               return ListView.builder(
                 restorationId: 'GroupDetailView',
                 itemCount: data.length,

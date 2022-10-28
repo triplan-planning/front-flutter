@@ -22,23 +22,15 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Groups"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.goNamed("settings");
-            },
-          ),
-          LogoutButton(
-            onSuccess: (ctx) => ctx.goNamed("login"),
-          ),
+        actions: const [
+          SettingsButton(),
+          LogoutButton(),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           GoRouter.of(context).pushNamed("groups_new");
-          // TODO refresh data after poping
           ref.refresh(allGroupsProvider);
         },
         child: const Icon(Icons.add),
@@ -58,7 +50,6 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
                 ),
                 onTap: () {
                   context.push("/groups/${group.id}");
-                  // TODO refresh data after poping
                   ref.refresh(allGroupsProvider);
                 });
           },
