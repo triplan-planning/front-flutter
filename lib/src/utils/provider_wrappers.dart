@@ -26,6 +26,6 @@ extension AsyncValueToWidget<T> on AsyncValue<T> {
 }
 
 Widget _defaultError(Object error, StackTrace? stack) {
-  log("[PROVIDER] : $error");
+  log("[PROVIDER WIDGET] : $error");
   return ErrorWidget("Error : $error");
 }
