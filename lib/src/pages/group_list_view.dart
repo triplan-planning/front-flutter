@@ -49,7 +49,12 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
                   child: const Icon(Icons.flight),
                 ),
                 onTap: () {
-                  context.push("/groups/${group.id}");
+                  // TODO : use push instead of go
+                  // opened issue : https://github.com/flutter/flutter/issues/111842
+                  context.goNamed(
+                    "groups_detail_balances",
+                    params: {"group_id": group.id},
+                  );
                   ref.refresh(allGroupsProvider);
                 });
           },

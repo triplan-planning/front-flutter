@@ -5,16 +5,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:triplan/src/forms/create_group_form.dart';
 import 'package:triplan/src/forms/create_transaction_form.dart';
-import 'package:triplan/src/pages/group_detail_view.dart';
+import 'package:triplan/src/pages/group_detail/group_detail_view.dart';
+import 'package:triplan/src/pages/group_detail/transactions_screen.dart';
+import 'package:triplan/src/pages/group_detail/users_screen.dart';
 import 'package:triplan/src/pages/group_list_view.dart';
 import 'package:triplan/src/pages/login_view.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
 import 'package:triplan/src/settings/settings_v2.dart';
 import 'package:triplan/src/settings/settings_view.dart';
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _groupDetailShellNavigatorKey = GlobalKey<NavigatorState>();
+
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    routes: <GoRoute>[
+    routes: [
       GoRoute(
         path: '/',
         name: 'homepage',
@@ -77,12 +82,54 @@ final routerProvider = Provider<GoRouter>((ref) {
           return const MaterialPage(child: CreateGroupForm());
         },
       ),
-      GoRoute(
-        path: '/groups/:group_id',
-        name: 'groups_detail',
-        builder: (BuildContext context, GoRouterState state) {
-          return GroupDetailView(groupId: state.params["group_id"]!);
+      ShellRoute(
+        navigatorKey: _groupDetailShellNavigatorKey,
+        builder: (context, state, child) {
+          // TODO : find a better way to access the group id
+          // state params empty here :(
+          String groupId = state.location.split("/")[2];
+          return GroupDetailView(
+            groupDetailChild: child,
+            groupId: groupId,
+          );
         },
+        routes: <RouteBase>[
+          GoRoute(
+            path: '/groups/:group_id',
+            name: 'groups_detail',
+            redirect: (context, state) {
+              log("[REDIRECT] redirect to default group detail tab");
+              return state.namedLocation(
+                "groups_detail_transactions",
+                params: {
+                  "group_id": state.params["group_id"]!,
+                },
+              );
+            },
+          ),
+          GoRoute(
+            path: '/groups/:group_id/transactions',
+            name: 'groups_detail_transactions',
+            pageBuilder: (context, state) {
+              return NoTransitionPage(
+                child: GroupDetailTransactionList(
+                  groupId: state.params["group_id"]!,
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/groups/:group_id/balances',
+            name: 'groups_detail_balances',
+            pageBuilder: (context, state) {
+              return NoTransitionPage(
+                child: GroupDetailBalanceList(
+                  groupId: state.params["group_id"]!,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/groups/:group_id/transactions/new',
@@ -93,6 +140,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
     initialLocation: "/groups/favorite",
     errorBuilder: (context, state) => ErrorWidget(state.error!),
+    navigatorKey: _rootNavigatorKey,
     redirect: (context, state) {
       final loginLoc = state.namedLocation("login");
       final bool loggedIn = null != ref.read(triplanPreferencesProvider).userId;

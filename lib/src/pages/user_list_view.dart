@@ -5,6 +5,7 @@ import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
+import 'package:triplan/src/widgets/user_list_item.dart';
 
 class UserListView extends ConsumerStatefulWidget {
   const UserListView({
@@ -40,21 +41,18 @@ class _UserListViewState extends ConsumerState<UserListView> {
             itemBuilder: (BuildContext context, int index) {
               final user = value[index];
 
-              return ListTile(
-                  title: Text('user: ${user.name}'),
-                  leading: Hero(
-                    tag: "user_${user.id}",
-                    child: const Icon(Icons.person),
-                  ),
-                  onTap: () {
-                    if (widget.onPick != null) {
-                      widget.onPick!(user);
-                    }
-                    if (widget.enableUserCreation) {
-                      GoRouter.of(context).push("users/${user.id}");
-                      ref.refresh(allUsersProvider);
-                    }
-                  });
+              return UserListItem(
+                user: user,
+                onTap: () {
+                  if (widget.onPick != null) {
+                    widget.onPick!(user);
+                  }
+                  if (widget.enableUserCreation) {
+                    GoRouter.of(context).push("users/${user.id}");
+                    ref.refresh(allUsersProvider);
+                  }
+                },
+              );
             },
           )),
     );
