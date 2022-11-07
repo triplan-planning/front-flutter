@@ -82,7 +82,14 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
             ),
           ],
         ),
-        actions: [FavoriteGroupButton(groupId: widget.groupId)],
+        actions: [
+          IconButton(
+            tooltip: "edit this group",
+            icon: Icon(Icons.edit),
+            onPressed: () {},
+          ),
+          FavoriteGroupButton(groupId: widget.groupId)
+        ],
       ),
       body: widget.groupDetailChild,
       bottomNavigationBar: BottomNavigationBar(
