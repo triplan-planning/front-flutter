@@ -53,16 +53,20 @@ class FavoriteGroupButton extends ConsumerWidget {
     bool isFavorite = favoriteGroupId != null && groupId == favoriteGroupId;
     if (isFavorite) {
       return IconButton(
-          onPressed: () async {
-            prefs.setFavoriteGroup(null);
-          },
-          icon: const Icon(Icons.favorite));
+        onPressed: () async {
+          prefs.setFavoriteGroup(null);
+        },
+        icon: const Icon(Icons.favorite),
+        tooltip: "mark this group as favorite",
+      );
     } else {
       return IconButton(
-          onPressed: () async {
-            prefs.setFavoriteGroup(groupId);
-          },
-          icon: const Icon(Icons.favorite_border));
+        onPressed: () async {
+          prefs.setFavoriteGroup(groupId);
+        },
+        icon: const Icon(Icons.favorite_border),
+        tooltip: "mark this group as not favorite",
+      );
     }
   }
 }
