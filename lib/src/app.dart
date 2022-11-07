@@ -18,6 +18,7 @@ class MyApp extends ConsumerWidget {
     // watching preferences allows to redraw the app if the theme preferences change
 
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       // Providing a restorationScopeId allows the Navigator built by the
       // MaterialApp to restore the navigation stack when a user leaves and
       // returns to the app after it has been killed while running in the

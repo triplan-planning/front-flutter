@@ -78,7 +78,7 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
               ),
             ),
             group.toWidgetDataOnly(
-              (value) => Text('Group : ${value.name}'),
+              (value) => Text(value.name),
             ),
           ],
         ),
