@@ -1,4 +1,4 @@
-FROM cirrusci/flutter:stable
+FROM cirrusci/flutter:stable AS build-env
 
 RUN flutter doctor
 RUN flutter config --enable-web
