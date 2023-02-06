@@ -71,19 +71,31 @@ class FavoriteGroupButton extends ConsumerWidget {
   }
 }
 
-class PopOrBackToListButton extends StatelessWidget {
-  const PopOrBackToListButton({super.key});
+class PopOrNavigateToNamedLocationButton extends StatelessWidget {
+  const PopOrNavigateToNamedLocationButton({
+    required this.locationName,
+    this.params,
+    this.onButtonPressed,
+    super.key,
+  });
+  final String locationName;
+  final Map<String, String>? params;
+  final Function()? onButtonPressed;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
+        if (null != onButtonPressed) {
+          onButtonPressed!();
+        }
+
         var nav = Navigator.of(context);
         if (nav.canPop()) {
           nav.pop();
         } else {
-          context.goNamed("groups_list");
+          context.goNamed(locationName, params: params ?? {});
         }
       },
     );

@@ -9,9 +9,11 @@ import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/providers/group_providers.dart';
+import 'package:triplan/src/providers/transaction_providers.dart';
 import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
+import 'package:triplan/src/widgets/buttons.dart';
 import 'package:triplan/src/widgets/error_text.dart';
 import 'package:triplan/src/widgets/transaction_form_user_item.dart';
 
@@ -43,6 +45,14 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: PopOrNavigateToNamedLocationButton(
+          locationName: "groups_detail",
+          params: {"group_id": widget.groupId},
+          onButtonPressed: () {
+            log("refreshing transaction and going back");
+            return ref.refresh(transactionsForGroupProvider(widget.groupId));
+          },
+        ),
         title: const Text('New Transaction'),
       ),
       body: Column(
@@ -172,7 +182,7 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
               return;
             }
             if (!mounted) return;
-            GoRouter.of(context).pop();
+            _formEndEvent(context, ref);
           } else {
             log("form not valid, please handle");
           }
@@ -182,6 +192,19 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
         label: const Text("Create Transaction"),
       ),
     );
+  }
+
+  void _formEndEvent(BuildContext context, WidgetRef widgetRef) {
+    var router = GoRouter.of(context);
+    if (router.canPop()) {
+      router.pop();
+    } else {
+      widgetRef.refresh(transactionsForGroupProvider(widget.groupId));
+      context.goNamed(
+        "groups_detail_transactions",
+        params: {"group_id": widget.groupId},
+      );
+    }
   }
 
   Future<User> _fetchUser(String userId) async {
@@ -196,10 +219,12 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
 
   Future<Transaction> _createTransaction(
       String groupId, Transaction transaction) async {
-    return createNew<Transaction>(
+    Future<Transaction> future = createNew<Transaction>(
       '/groups/$groupId/transactions',
       transaction,
       Transaction.fromJson,
     );
+
+    return future;
   }
 }

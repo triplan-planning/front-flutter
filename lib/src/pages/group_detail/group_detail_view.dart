@@ -67,7 +67,9 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const PopOrBackToListButton(),
+        leading: const PopOrNavigateToNamedLocationButton(
+          locationName: "groups_list",
+        ),
         title: Row(
           children: [
             Padding(

@@ -16,7 +16,9 @@ class SettingsView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const PopOrBackToListButton(),
+        leading: const PopOrNavigateToNamedLocationButton(
+          locationName: "groups_list",
+        ),
         title: const Text('Settings'),
       ),
       body: Padding(
