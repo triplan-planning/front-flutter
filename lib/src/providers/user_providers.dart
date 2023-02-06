@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/providers/preferences_providers.dart';
@@ -15,14 +17,18 @@ final loggedInUserProvider = FutureProvider<User>((ref) async {
   return ref.watch(singleUserProvider(currentUserId).future);
 });
 
-final singleUserProvider = FutureProviderFamily<User, String>(
-  ((ref, id) async {
+final singleUserProvider = FutureProviderFamily<User, String?>(
+  (ref, id) async {
+    if (id == null) {
+      log("[PROVIDER] no id provided for user, no data fetched from API");
+      return Future.error("no id passed");
+    }
     Future<User> response = fetchAndDecode(
       '/users/$id',
       (u) => User.fromJson(u),
     );
     return response;
-  }),
+  },
 );
 
 final allUsersProvider = FutureProvider<List<User>>(
