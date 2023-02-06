@@ -12,6 +12,16 @@ extension AsyncValueToWidget<T> on AsyncValue<T> {
     );
   }
 
+  Widget toWidgetWithLoading(
+      {required Widget Function(T) widgetBuilder,
+      required Widget loadingWidget}) {
+    return when(
+      data: widgetBuilder,
+      error: _defaultError,
+      loading: () => loadingWidget,
+    );
+  }
+
   Widget toWidgetIgnoreError(Widget Function(T) builder) {
     return when(
       data: builder,
