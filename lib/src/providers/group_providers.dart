@@ -4,21 +4,21 @@ import '../models/group.dart';
 import '../utils/api_tools.dart';
 
 final singleGroupProvider = FutureProviderFamily<Group, String>(
-  ((ref, id) async {
+  (ref, id) async {
     Future<Group> response = fetchAndDecode(
       '/groups/$id',
       (u) => Group.fromJson(u),
     );
     return response;
-  }),
+  },
 );
 
 final allGroupsProvider = FutureProvider<List<Group>>(
-  ((ref) async {
+  (ref) async {
     Future<List<Group>> response = fetchAndDecodeList(
       '/groups',
       (l) => l.map((e) => Group.fromJson(e)).toList(),
     );
     return response;
-  }),
+  },
 );
