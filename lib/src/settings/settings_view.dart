@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:triplan/src/models/group.dart';
+import 'package:triplan/src/models/user.dart';
+import 'package:triplan/src/providers/group_providers.dart';
+import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/settings/settings_v2.dart';
+import 'package:triplan/src/settings/settings_widgets.dart';
 import 'package:triplan/src/widgets/buttons.dart';
 
 /// Displays the various settings that can be customized by the user.
@@ -12,7 +17,12 @@ class SettingsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var controller = ref.watch(triplanPreferencesProvider);
+    var preferences = ref.watch(triplanPreferencesProvider);
+
+    AsyncValue<Group> favoriteGroup =
+        ref.watch(singleGroupProvider(preferences.favoriteGroup));
+    AsyncValue<User> currentUser =
+        ref.watch(singleUserProvider(preferences.userId));
 
     return Scaffold(
       appBar: AppBar(
@@ -36,7 +46,7 @@ class SettingsView extends ConsumerWidget {
               title: const Text("Theme"),
               trailing: DropdownButton<ThemeMode>(
                 // Read the selected themeMode from the controller
-                value: controller.themeMode,
+                value: preferences.themeMode,
                 // Call the updateThemeMode method any time the user selects a theme.
                 onChanged: (value) {
                   if (value == null) {
@@ -64,7 +74,8 @@ class SettingsView extends ConsumerWidget {
             ),
             CheckboxListTile(
               title: const Text("Developer mode"),
-              value: controller.devMode,
+              value: preferences.devMode,
+              activeColor: Colors.red,
               onChanged: (value) {
                 if (value == null) {
                   return;
@@ -72,20 +83,14 @@ class SettingsView extends ConsumerWidget {
                 ref.read(triplanPreferencesProvider.notifier).setDevMode(value);
               },
             ),
-            ListTile(
-              title: const Text("User id"),
-              trailing: Text(
-                controller.userId ?? "NOT CONNECTED",
-                style: const TextStyle(fontFamily: "monospace"),
-              ),
+            CurrentUserSettingWidget(
+              userId: preferences.userId,
+              userValue: currentUser,
             ),
-            ListTile(
-              title: const Text("favorite group"),
-              trailing: Text(
-                controller.favoriteGroup ?? "NO FAVORITE",
-                style: const TextStyle(fontFamily: "monospace"),
-              ),
-            ),
+            FavoriteGroupSettingWidget(
+              groupId: preferences.favoriteGroup,
+              groupValue: favoriteGroup,
+            )
           ],
         ),
       ),
