@@ -74,7 +74,15 @@ Future<T> fetchAndDecode<T>(
 
   var jsonResponse = jsonDecode(response.decodedBody);
 
-  return deserializer(jsonResponse);
+  T result;
+  try {
+    result = deserializer(jsonResponse);
+  } catch (e) {
+    log("Mapping error :", error: e);
+    throw Exception(e);
+  }
+
+  return result;
 }
 
 Future<T> createNew<T extends Serializable>(String path, T entity,
