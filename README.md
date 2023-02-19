@@ -1,6 +1,6 @@
 # triplan
 
-A new Flutter project.
+Split bills, not friendships.
 
 ## Getting Started
 
