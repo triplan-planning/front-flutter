@@ -48,7 +48,7 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
   void initState() {
     tabs = [
       BottomNavigationBarItemTriplan(
-        icon: const Icon(Icons.money),
+        icon: const Icon(Icons.payments_outlined),
         label: 'Transactions',
         path: '/groups/${widget.groupId}/transactions',
       ),
@@ -76,7 +76,7 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
               padding: const EdgeInsets.only(right: 8),
               child: Hero(
                 tag: "group_${widget.groupId}",
-                child: const Icon(Icons.flight),
+                child: const Icon(Icons.group),
               ),
             ),
             group.toWidgetDataOnly(

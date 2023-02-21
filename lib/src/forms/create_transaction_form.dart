@@ -64,96 +64,108 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
             ),
           Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'title'),
-                  controller: _transactionTitle,
-                ),
-                TextFormField(
-                  autofocus: true,
-                  decoration: const InputDecoration(labelText: 'category'),
-                  controller: _transactionCategory,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(hintText: 'amount'),
-                  controller: _transactionAmount,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an amount';
-                    }
-                    return null;
-                  },
-                ),
-                groupUsers.toWidget(
-                  (users) {
-                    User? initialUserSelected;
-                    currentUser.whenData(
-                      (currentUser) {
-                        if (users.contains(currentUser)) {
-                          log("current user in group, defined as payer");
-                          initialUserSelected = currentUser;
-                          setState(() {
-                            _payingUser = initialUserSelected;
-                          });
-                        } else {
-                          log("current user not in group, no default payer");
-                        }
-                      },
-                    );
-                    return Column(
-                      children: [
-                        Flex(
-                          direction: Axis.horizontal,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            const Text("paid by"),
-                            UserSelector(
-                              users: users,
-                              initialValue: initialUserSelected,
-                              onChanged: (User? newValue) {
-                                log("DEBUG user changed to $newValue");
-                                setState(
-                                  () {
-                                    _payingUser = newValue!;
-                                  },
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const Divider(),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: users.length,
-                          itemBuilder: ((context, index) {
-                            final user = users[index];
-                            return TransactionFormUserItem(
-                              user: user,
-                              onChanged: (TransactionTarget newValue) {
-                                setState(() {
-                                  _paidFor[user] = newValue;
-                                });
-                              },
-                            );
-                          }),
-                        )
-                      ],
-                    );
-                  },
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Category',
+                      prefixIcon: Icon(Icons.category),
+                    ),
+                    controller: _transactionCategory,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Title (optional)',
+                      prefixIcon: Icon(Icons.title),
+                    ),
+                    controller: _transactionTitle,
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Amount',
+                      prefixIcon: Icon(Icons.money),
+                    ),
+                    controller: _transactionAmount,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter an amount';
+                      }
+                      return null;
+                    },
+                  ),
+                  groupUsers.toWidget(
+                    (users) {
+                      User? initialUserSelected;
+                      currentUser.whenData(
+                        (currentUser) {
+                          if (users.contains(currentUser)) {
+                            log("current user in group, defined as payer");
+                            initialUserSelected = currentUser;
+                            setState(() {
+                              _payingUser = initialUserSelected;
+                            });
+                          } else {
+                            log("current user not in group, no default payer");
+                          }
+                        },
+                      );
+                      return Column(
+                        children: [
+                          Flex(
+                            direction: Axis.horizontal,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              const Text("Paid by"),
+                              UserSelector(
+                                users: users,
+                                initialValue: initialUserSelected,
+                                onChanged: (User? newValue) {
+                                  log("DEBUG user changed to $newValue");
+                                  setState(
+                                    () {
+                                      _payingUser = newValue!;
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: users.length,
+                            itemBuilder: ((context, index) {
+                              final user = users[index];
+                              return TransactionFormUserItem(
+                                user: user,
+                                onChanged: (TransactionTarget newValue) {
+                                  setState(() {
+                                    _paidFor[user] = newValue;
+                                  });
+                                },
+                              );
+                            }),
+                          )
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -12,10 +12,12 @@ class TransactionListItem extends StatelessWidget {
       title: Text(transaction.category),
       leading: Hero(
         tag: "transaction_${transaction.id}",
-        child: const Icon(Icons.attach_money),
+        child: const Icon(Icons.payment),
       ),
-      trailing: Text('\$${transaction.amount / 100}€'),
-      subtitle: Text('${transaction.title}'),
+      trailing: Text('${transaction.amount / 100}€'),
+      subtitle: transaction.title == null
+          ? Container()
+          : Text('${transaction.title}'),
     );
   }
 }

@@ -43,11 +43,12 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
             final group = value[index];
 
             return ListTile(
-                title: Text('group: ${group.name}'),
+                title: Text(group.name),
                 leading: Hero(
                   tag: "group_${group.id}",
-                  child: const Icon(Icons.flight),
+                  child: const Icon(Icons.group),
                 ),
+                trailing: Text('(${group.userIds.length})'),
                 onTap: () {
                   // TODO : use push instead of go
                   // opened issue : https://github.com/flutter/flutter/issues/111842
