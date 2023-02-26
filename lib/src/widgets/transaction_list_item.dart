@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/transaction.dart';
 
 class TransactionListItem extends StatelessWidget {
@@ -18,6 +19,14 @@ class TransactionListItem extends StatelessWidget {
       subtitle: transaction.title == null
           ? Container()
           : Text('${transaction.title}'),
+      onTap: () {
+        context.goNamed(
+          "transaction_detail",
+          params: {
+            "transaction_id": transaction.id,
+          },
+        );
+      },
     );
   }
 }

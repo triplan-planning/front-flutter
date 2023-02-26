@@ -88,7 +88,13 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
           IconButton(
             tooltip: "edit this group",
             icon: Icon(Icons.edit),
-            onPressed: () {},
+            onPressed: () {
+              var snackBar = const SnackBar(
+                content: Text('This feature is not implemented yet'),
+                backgroundColor: Colors.amber,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            },
           ),
           FavoriteGroupButton(groupId: widget.groupId)
         ],

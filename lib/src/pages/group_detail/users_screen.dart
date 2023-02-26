@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/balance.dart';
 import 'package:triplan/src/models/user.dart';
 import 'package:triplan/src/providers/balances_providers.dart';
@@ -41,7 +42,7 @@ class _GroupDetailBalanceListState
                   final totalAmount = balance.totalAmount / 100;
 
                   return BalanceAmount(
-                    payerName: user.name,
+                    payer: user,
                     amount: totalAmount,
                   );
                 },
@@ -55,10 +56,9 @@ class _GroupDetailBalanceListState
 }
 
 class BalanceAmount extends StatelessWidget {
-  const BalanceAmount(
-      {required this.payerName, required this.amount, super.key});
+  const BalanceAmount({required this.payer, required this.amount, super.key});
   final double amount;
-  final String payerName;
+  final User payer;
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +71,19 @@ class BalanceAmount extends StatelessWidget {
     }
 
     return ListTile(
-      title: Text(payerName),
+      title: Text(payer.name),
       trailing: Text(
         '$amount €',
         style: textStyle,
       ),
+      onTap: () {
+        context.goNamed(
+          "users_detail",
+          params: {
+            "user_id": payer.id,
+          },
+        );
+      },
     );
   }
 }

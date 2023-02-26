@@ -53,7 +53,7 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
                   // TODO : use push instead of go
                   // opened issue : https://github.com/flutter/flutter/issues/111842
                   context.goNamed(
-                    "groups_detail_balances",
+                    "groups_detail_transactions",
                     params: {"group_id": group.id},
                   );
                   ref.refresh(allGroupsProvider);

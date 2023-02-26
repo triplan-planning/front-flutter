@@ -6,7 +6,7 @@ import 'package:triplan/src/models/user.dart';
 class CurrentUserSettingWidget extends StatelessWidget {
   final AsyncValue<User> userValue;
   final String? userId;
-  final Widget title = const Text("User");
+  final Widget title = const Text("Current User");
   const CurrentUserSettingWidget({
     required this.userValue,
     required this.userId,

@@ -5,10 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:triplan/src/forms/form_fields/user_selector.dart';
-import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/transaction.dart';
 import 'package:triplan/src/models/user.dart';
-import 'package:triplan/src/providers/group_providers.dart';
 import 'package:triplan/src/providers/transaction_providers.dart';
 import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
@@ -38,7 +36,6 @@ class _CreateTransactionFormState extends ConsumerState<CreateTransactionForm> {
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<Group> group = ref.watch(singleGroupProvider(widget.groupId));
     AsyncValue<User> currentUser = ref.watch(loggedInUserProvider);
     AsyncValue<List<User>> groupUsers =
         ref.watch(groupUsersProvider(widget.groupId));

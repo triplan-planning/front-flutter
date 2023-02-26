@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/models/user.dart';
@@ -7,6 +8,8 @@ import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/settings/settings_v2.dart';
 import 'package:triplan/src/settings/settings_widgets.dart';
 import 'package:triplan/src/widgets/buttons.dart';
+
+String baseUrl = dotenv.get("BACK_END_URL");
 
 /// Displays the various settings that can be customized by the user.
 ///
@@ -73,7 +76,7 @@ class SettingsView extends ConsumerWidget {
               ),
             ),
             CheckboxListTile(
-              title: const Text("Developer mode"),
+              title: const Text("Developer Mode"),
               value: preferences.devMode,
               activeColor: Colors.red,
               onChanged: (value) {
@@ -83,14 +86,23 @@ class SettingsView extends ConsumerWidget {
                 ref.read(triplanPreferencesProvider.notifier).setDevMode(value);
               },
             ),
-            CurrentUserSettingWidget(
-              userId: preferences.userId,
-              userValue: currentUser,
-            ),
-            FavoriteGroupSettingWidget(
-              groupId: preferences.favoriteGroup,
-              groupValue: favoriteGroup,
-            )
+            if (preferences.devMode)
+              CurrentUserSettingWidget(
+                userId: preferences.userId,
+                userValue: currentUser,
+              ),
+            if (preferences.devMode)
+              FavoriteGroupSettingWidget(
+                groupId: preferences.favoriteGroup,
+                groupValue: favoriteGroup,
+              ),
+            if (preferences.devMode)
+              ListTile(
+                title: const Text("Backend URL"),
+                trailing: Text(
+                  dotenv.get("BACK_END_URL"),
+                ),
+              ),
           ],
         ),
       ),

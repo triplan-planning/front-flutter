@@ -10,6 +10,7 @@ import 'package:triplan/src/pages/group_detail/transactions_screen.dart';
 import 'package:triplan/src/pages/group_detail/users_screen.dart';
 import 'package:triplan/src/pages/group_list_view.dart';
 import 'package:triplan/src/pages/login_view.dart';
+import 'package:triplan/src/pages/transaction_detail_view.dart';
 import 'package:triplan/src/pages/user_detail_view.dart';
 import 'package:triplan/src/settings/settings_v2.dart';
 import 'package:triplan/src/settings/settings_view.dart';
@@ -40,11 +41,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/users/user_id',
+        path: '/users/:user_id',
         name: 'users_detail',
         pageBuilder: (BuildContext context, GoRouterState state) {
           return MaterialPage(
               child: UserDetailView(userId: state.params["user_id"]!));
+        },
+      ),
+      GoRoute(
+        path: '/transactions/:transaction_id',
+        name: 'transaction_detail',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return MaterialPage(
+            child: TransactionDetailView(
+              transactionId: state.params["transaction_id"]!,
+            ),
+          );
         },
       ),
       GoRoute(

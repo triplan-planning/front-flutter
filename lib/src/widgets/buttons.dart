@@ -84,8 +84,7 @@ class PopOrNavigateToNamedLocationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.arrow_back),
+    return BackButton(
       onPressed: () {
         if (null != onButtonPressed) {
           onButtonPressed!();
