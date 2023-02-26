@@ -48,11 +48,14 @@ class Transaction implements Serializable {
   final String? title;
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
+    final targets = (json['paidFor'] as List<dynamic>)
+        .map((e) => TransactionTarget.fromJson(e))
+        .toList();
     return Transaction(
       id: json['id'],
       groupId: json['group'],
       paidBy: json['paidBy'],
-      paidFor: (json['paidFor'] as List<dynamic>).cast<TransactionTarget>(),
+      paidFor: targets,
       amount: json['amount'],
       date: DateTime.parse(json['date']),
       category: json['category'],
