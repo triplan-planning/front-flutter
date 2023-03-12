@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/providers/group_providers.dart';
 import 'package:triplan/src/utils/api_tools.dart';
+import 'package:triplan/src/utils/layout_utils.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
 import 'package:triplan/src/widgets/buttons.dart';
 
@@ -35,30 +36,32 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
         },
         child: const Icon(Icons.add),
       ),
-      body: groups.toWidget(
-        (value) => ListView.builder(
-          restorationId: 'GroupListView',
-          itemCount: value.length,
-          itemBuilder: (BuildContext context, int index) {
-            final group = value[index];
+      body: GlobalWidthWrapper(
+        child: groups.toWidget(
+          (value) => ListView.builder(
+            restorationId: 'GroupListView',
+            itemCount: value.length,
+            itemBuilder: (BuildContext context, int index) {
+              final group = value[index];
 
-            return ListTile(
-                title: Text(group.name),
-                leading: Hero(
-                  tag: "group_${group.id}",
-                  child: const Icon(Icons.group),
-                ),
-                trailing: Text('(${group.userIds.length})'),
-                onTap: () {
-                  // TODO : use push instead of go
-                  // opened issue : https://github.com/flutter/flutter/issues/111842
-                  context.goNamed(
-                    "groups_detail_transactions",
-                    params: {"group_id": group.id},
-                  );
-                  ref.refresh(allGroupsProvider);
-                });
-          },
+              return ListTile(
+                  title: Text(group.name),
+                  leading: Hero(
+                    tag: "group_${group.id}",
+                    child: const Icon(Icons.group),
+                  ),
+                  trailing: Text('(${group.userIds.length})'),
+                  onTap: () {
+                    // TODO : use push instead of go
+                    // opened issue : https://github.com/flutter/flutter/issues/111842
+                    context.goNamed(
+                      "groups_detail_transactions",
+                      params: {"group_id": group.id},
+                    );
+                    ref.refresh(allGroupsProvider);
+                  });
+            },
+          ),
         ),
       ),
     );

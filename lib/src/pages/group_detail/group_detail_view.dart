@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:triplan/src/models/group.dart';
 import 'package:triplan/src/providers/group_providers.dart';
+import 'package:triplan/src/utils/layout_utils.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
 import 'package:triplan/src/widgets/buttons.dart';
 
@@ -99,7 +100,7 @@ class _GroupDetailViewState extends ConsumerState<GroupDetailView> {
           FavoriteGroupButton(groupId: widget.groupId)
         ],
       ),
-      body: widget.groupDetailChild,
+      body: GlobalWidthWrapper(child: widget.groupDetailChild),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         items: tabs,

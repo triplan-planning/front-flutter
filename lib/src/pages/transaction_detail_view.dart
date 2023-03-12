@@ -10,6 +10,7 @@ import 'package:triplan/src/providers/group_providers.dart';
 import 'package:triplan/src/providers/transaction_providers.dart';
 import 'package:triplan/src/providers/user_providers.dart';
 import 'package:triplan/src/utils/date_utils.dart';
+import 'package:triplan/src/utils/layout_utils.dart';
 import 'package:triplan/src/utils/provider_wrappers.dart';
 import 'package:triplan/src/widgets/buttons.dart';
 
@@ -72,64 +73,93 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView> {
         ],
       ),
       body: transactionValue.toWidgetDataOnly(
-        (transaction) => Column(
-          children: [
-            groupValue.toWidgetWithLoading(
-              (group) => ListTile(
-                leading: const Icon(Icons.group),
-                title: Text(group.name),
-              ),
-              loadingWidget: ListTile(
-                leading: const Icon(Icons.group),
-                title: Text(transaction.groupId),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.category),
-              title: Text(transaction.category),
-            ),
-            if (transaction.title != null)
-              ListTile(
-                leading: const Icon(Icons.title),
-                title: Text(transaction.title!),
-              ),
-            ListTile(
-              leading: const Icon(Icons.date_range),
-              title: Text(dateTimeFormat.format(transaction.date)),
-            ),
-            ListTile(
-              leading: const Icon(Icons.money),
-              title: Text("${transaction.amount / 100}€"),
-            ),
-            ListTile(
-              leading: const Icon(Icons.paid),
-              title: Text(payer?.name ?? transaction.paidBy),
-              trailing: Text("${transaction.amount / 100}€"),
-            ),
-            const Divider(),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: transaction.paidFor.length,
-              itemBuilder: (context, index) {
-                final TransactionTarget target = transaction.paidFor[index];
-                User? payee;
-                groupUsersValue.whenData((groupUsers) {
-                  payee = groupUsers.firstWhereOrNull((u) {
-                    return u.id == target.userId;
-                  });
-                });
-                num amount = (target.computedPrice ?? 0) / 100;
-                return ListTile(
-                  leading: const Icon(Icons.person),
-                  title: Text(payee?.name ?? target.userId),
-                  subtitle: Text("weight : ${target.weight ?? 0}"),
-                  trailing: Text("$amount€"),
-                );
-              },
-            )
-          ],
+        (transaction) => GlobalWidthWrapper(
+          child: TransactionDetailBody(
+            groupValue: groupValue,
+            payer: payer,
+            groupUsersValue: groupUsersValue,
+            transaction: transaction,
+          ),
         ),
       ),
+    );
+  }
+}
+
+class TransactionDetailBody extends StatelessWidget {
+  const TransactionDetailBody({
+    super.key,
+    required this.groupValue,
+    required this.payer,
+    required this.groupUsersValue,
+    required this.transaction,
+  });
+
+  final AsyncValue<Group> groupValue;
+  final User? payer;
+  final AsyncValue<List<User>> groupUsersValue;
+  final Transaction transaction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        groupValue.toWidgetWithLoading(
+          (group) => ListTile(
+            leading: const Icon(Icons.group),
+            title: Text(group.name),
+          ),
+          loadingWidget: ListTile(
+            leading: const Icon(Icons.group),
+            title: Text(transaction.groupId),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.category),
+          title: Text(transaction.category),
+        ),
+        if (transaction.title != null)
+          ListTile(
+            leading: const Icon(Icons.title),
+            title: Text(transaction.title!),
+          ),
+        ListTile(
+          leading: const Icon(Icons.date_range),
+          title: Text(dateTimeFormat.format(transaction.date)),
+        ),
+        ListTile(
+          leading: const Icon(Icons.money),
+          title: Text("${transaction.amount / 100}€"),
+        ),
+        ListTile(
+          leading: const Icon(Icons.paid),
+          title: Text(payer?.name ?? transaction.paidBy),
+          trailing: Text("${transaction.amount / 100}€"),
+        ),
+        const Divider(),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: transaction.paidFor.length,
+          itemBuilder: (context, index) {
+            final TransactionTarget target = transaction.paidFor[index];
+            User? payee;
+            groupUsersValue.whenData((groupUsers) {
+              payee = groupUsers.firstWhereOrNull((u) {
+                return u.id == target.userId;
+              });
+            });
+            num amount = (target.computedPrice ?? 0) / 100;
+            return ListTile(
+              leading: const Icon(Icons.person),
+              title: Text(payee?.name ?? target.userId),
+              subtitle: (target.weight != null && target.weight != 1)
+                  ? Text("weight : ${target.weight! * 100}%")
+                  : null,
+              trailing: Text("$amount€"),
+            );
+          },
+        )
+      ],
     );
   }
 }

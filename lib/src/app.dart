@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/src/router.dart';
 import 'package:triplan/src/router.dart';
 import 'package:triplan/src/settings/settings_v2.dart';
 
@@ -17,6 +18,25 @@ class MyApp extends ConsumerWidget {
     final prefs = ref.watch(triplanPreferencesProvider);
     // watching preferences allows to redraw the app if the theme preferences change
 
+    return AppWithRouter(
+      preferences: prefs,
+      router: router,
+    );
+  }
+}
+
+class AppWithRouter extends StatelessWidget {
+  const AppWithRouter({
+    super.key,
+    required this.preferences,
+    required this.router,
+  });
+
+  final PreferencesState preferences;
+  final GoRouter router;
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       // Providing a restorationScopeId allows the Navigator built by the
@@ -57,7 +77,7 @@ class MyApp extends ConsumerWidget {
         brightness: Brightness.dark,
         useMaterial3: true,
       ),
-      themeMode: prefs.themeMode,
+      themeMode: preferences.themeMode,
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
       routeInformationProvider: router.routeInformationProvider,
